@@ -110,8 +110,6 @@ def property_view_page():
 
     display_property_descriptions()
 
-    display_property_descriptions()
-
 def display_traffic_light(selected_data):
     df = pd.DataFrame([{k: f"{v:.2f}" for k, v in m['properties'].items()} for m in selected_data])
     df.index = [m['name'] for m in selected_data]
