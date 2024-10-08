@@ -9,6 +9,8 @@ import io
 import base64
 import math
 
+st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
+
 def get_layout():
     # Use the session state to determine the layout
     return 3 if st.session_state.get('is_portrait', False) else 5
@@ -201,8 +203,6 @@ def display_radar_plot(selected_data):
     st.plotly_chart(fig, use_container_width=True)
     
 def main():
-    st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
-
     # Inject JavaScript for dimension detection
     st.markdown(
         """
