@@ -123,10 +123,34 @@ def display_traffic_light(selected_data):
     styled_df = styled_df.set_table_styles([
         {'selector': 'th', 'props': [('font-weight', 'bold'), ('text-align', 'center'), ('vertical-align', 'middle')]},
         {'selector': 'td', 'props': [('text-align', 'center'), ('vertical-align', 'middle')]},
+        {'selector': '.col_heading', 'props': [('text-align', 'center'), ('font-weight', 'bold')]},
+        {'selector': '.row_heading', 'props': [('text-align', 'center'), ('font-weight', 'bold')]},
     ])
     
-    # Use st.table instead of st.markdown for better performance
-    st.table(styled_df)
+    # Convert to HTML and adjust cell padding
+    html = styled_df.to_html()
+    html = html.replace('<td', '<td style="padding: 10px;"')
+    html = html.replace('<th', '<th style="padding: 10px;"')
+    
+    # Wrap the table in a div with custom CSS for center alignment
+    centered_html = f"""
+    <div style="display: flex; justify-content: center;">
+        <style>
+            table {{
+                border-collapse: collapse;
+                margin: 0 auto;
+            }}
+            th, td {{
+                border: 1px solid black;
+                text-align: center;
+                vertical-align: middle;
+            }}
+        </style>
+        {html}
+    </div>
+    """
+    
+    st.markdown(centered_html, unsafe_allow_html=True)
     
 @st.cache_data
 def prepare_radar_data(selected_data):
