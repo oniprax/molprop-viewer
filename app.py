@@ -83,8 +83,7 @@ def molecule_selection_page():
     st.subheader("Select Molecules (up to 5)")
 
     layout = get_layout()
-    molecule_size = 120 if layout == 3 else 150
-    font_size = 14 if layout == 3 else 16
+    molecule_size = 150
 
     for i in range(0, len(molecules), layout):
         cols = st.columns(layout)
@@ -92,13 +91,13 @@ def molecule_selection_page():
             if i + j < len(molecules):
                 molecule = molecules[i + j]
                 with col:
-                    selected = st.checkbox(molecule['name'], key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
+                    selected = st.checkbox("", key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
                     svg = mol_to_svg(molecule['smiles'], size=molecule_size)
                     if svg != "Invalid SMILES":
                         st.components.v1.html(svg, height=molecule_size, width=molecule_size)
                     else:
                         st.warning(f"Could not render molecule: {molecule['name']}")
-                    st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: {font_size}px;'>{molecule['name']}</p>", unsafe_allow_html=True)
+                    st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 16px;'>{molecule['name']}</p>", unsafe_allow_html=True)
                 
                 if selected and molecule['name'] not in st.session_state.selected_molecules:
                     if len(st.session_state.selected_molecules) < 5:
@@ -122,12 +121,12 @@ def property_view_page():
     cols = st.columns(len(selected_data))
     for i, mol in enumerate(selected_data):
         with cols[i]:
-            svg = mol_to_svg(mol['smiles'], size=120)
+            svg = mol_to_svg(mol['smiles'], size=150)
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=120, width=120)
+                st.components.v1.html(svg, height=150, width=150)
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
-            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 14px;'>{mol['name']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 16px;'>{mol['name']}</p>", unsafe_allow_html=True)
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
 
@@ -135,46 +134,40 @@ def property_view_page():
         display_traffic_light(selected_data)
     else:
         display_radar_plot(selected_data)
-        
+
+    # Display property descriptions
+    st.subheader("Property Descriptions")
+    for prop, desc in property_descriptions.items():
+        st.markdown(f"**{prop}**: {desc}")
+
 def display_traffic_light(selected_data):
-    df = pd.DataFrame([m['properties'] for m in selected_data])
+    df = pd.DataFrame([{k: f"{v:.2f}" for k, v in m['properties'].items()} for m in selected_data])
     df.index = [m['name'] for m in selected_data]
     
-    # Create a styled dataframe
     def color_cells(val, prop):
-        color = get_traffic_light_color(prop, val)
-        return f'background-color: {color}; color: black; font-weight: bold; text-align: center; vertical-align: middle;'
+        color = get_traffic_light_color(prop, float(val))
+        return f'background-color: {color}; color: black; text-align: center'
 
     styled_df = df.style.apply(lambda col: [color_cells(val, col.name) for val in col], axis=0)
     
-    # Center-align and bold the column names and index
     styled_df = styled_df.set_table_styles([
-        {'selector': 'th', 'props': [('font-weight', 'bold'), ('text-align', 'center'), ('vertical-align', 'middle')]},
-        {'selector': 'td', 'props': [('text-align', 'center'), ('vertical-align', 'middle')]},
-        {'selector': 'tr:hover', 'props': [('background-color', 'lightgrey')]},
+        {'selector': 'th', 'props': [('font-weight', 'bold'), ('text-align', 'center')]},
+        {'selector': 'td', 'props': [('text-align', 'center')]}
     ])
     
-    # Bold and center the index (molecule names)
-    styled_df = styled_df.set_properties(**{'font-weight': 'bold', 'text-align': 'center', 'vertical-align': 'middle'})
-    
-    # Convert to HTML and adjust cell padding
-    html = styled_df.to_html()
-    html = html.replace('<td', '<td style="padding: 10px;"')
-    
-    st.write(html, unsafe_allow_html=True)
+    st.table(styled_df)
 
 def display_radar_plot(selected_data):
     df = pd.DataFrame([m["properties"] for m in selected_data])
+    df = df.round(2)  # Round to 2 decimal places
     df.index = [m["name"] for m in selected_data]
-    
-    properties = list(df.columns)
     
     fig = go.Figure()
 
     for molecule in df.index:
         fig.add_trace(go.Scatterpolar(
             r=df.loc[molecule].values.tolist() + [df.loc[molecule].values[0]],
-            theta=properties + [properties[0]],
+            theta=df.columns.tolist() + [df.columns[0]],
             fill='toself',
             name=molecule
         ))
