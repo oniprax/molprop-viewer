@@ -5,6 +5,7 @@ from rdkit import Chem
 from rdkit.Chem import Draw
 import io
 import base64
+import math
 
 # Define molecules and their properties
 molecules = [
@@ -121,9 +122,18 @@ def display_traffic_light(selected_data):
     # Create a styled dataframe
     def color_cells(val, prop):
         color = get_traffic_light_color(prop, val)
-        return f'background-color: {color}'
+        return f'background-color: {color}; color: black; font-weight: bold; text-align: center'
 
     styled_df = df.style.apply(lambda col: [color_cells(val, col.name) for val in col], axis=0)
+    
+    # Center-align and bold the column names
+    styled_df = styled_df.set_table_styles([
+        {'selector': 'th', 'props': [('font-weight', 'bold'), ('text-align', 'center')]},
+        {'selector': 'td', 'props': [('text-align', 'center')]}
+    ])
+    
+    # Bold and center the index (molecule names)
+    styled_df = styled_df.set_properties(**{'font-weight': 'bold', 'text-align': 'center'})
     
     st.table(styled_df)
 
