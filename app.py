@@ -12,7 +12,6 @@ import math
 st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
 
 def get_layout():
-    # Use the session state to determine the layout
     return 3 if st.session_state.get('is_portrait', False) else 5
     
 # Define molecules and their properties
@@ -79,6 +78,11 @@ if 'page' not in st.session_state:
 if 'selected_molecules' not in st.session_state:
     st.session_state.selected_molecules = []
 
+def display_property_descriptions():
+    st.subheader("Property Descriptions")
+    for prop, desc in property_descriptions.items():
+        st.markdown(f"- **{prop}**: {desc}")
+
 def molecule_selection_page():
     st.subheader("Select Molecules (up to 5)")
 
@@ -87,10 +91,10 @@ def molecule_selection_page():
 
     for i in range(0, len(molecules), layout):
         cols = st.columns(layout)
-        for j, col in enumerate(cols):
+        for j in range(layout):
             if i + j < len(molecules):
                 molecule = molecules[i + j]
-                with col:
+                with cols[j]:
                     selected = st.checkbox("", key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
                     svg = mol_to_svg(molecule['smiles'], size=molecule_size)
                     if svg != "Invalid SMILES":
@@ -105,9 +109,9 @@ def molecule_selection_page():
                 elif not selected and molecule['name'] in st.session_state.selected_molecules:
                     st.session_state.selected_molecules.remove(molecule['name'])
 
-    if st.button("View Properties", key='view_properties') and st.session_state.selected_molecules:
-        st.session_state.page = 'property_view'
-        st.rerun()
+    # if st.button("View Properties", key='view_properties') and st.session_state.selected_molecules:
+    #     st.session_state.page = 'property_view'
+    #     st.rerun()
 
 def property_view_page():
     if st.button("← Back to Selection"):
@@ -136,9 +140,9 @@ def property_view_page():
         display_radar_plot(selected_data)
 
     # Display property descriptions
-    st.subheader("Property Descriptions")
-    for prop, desc in property_descriptions.items():
-        st.markdown(f"**{prop}**: {desc}")
+    # st.subheader("Property Descriptions")
+    # for prop, desc in property_descriptions.items():
+    #     st.markdown(f"**{prop}**: {desc}")
 
 def display_traffic_light(selected_data):
     df = pd.DataFrame([{k: f"{v:.2f}" for k, v in m['properties'].items()} for m in selected_data])
@@ -146,16 +150,17 @@ def display_traffic_light(selected_data):
     
     def color_cells(val, prop):
         color = get_traffic_light_color(prop, float(val))
-        return f'background-color: {color}; color: black; text-align: center'
+        return f'background-color: {color}; color: black; text-align: center; vertical-align: middle;'
 
     styled_df = df.style.apply(lambda col: [color_cells(val, col.name) for val in col], axis=0)
     
     styled_df = styled_df.set_table_styles([
-        {'selector': 'th', 'props': [('font-weight', 'bold'), ('text-align', 'center')]},
-        {'selector': 'td', 'props': [('text-align', 'center')]}
+        {'selector': 'th', 'props': [('font-weight', 'bold'), ('text-align', 'center'), ('vertical-align', 'middle')]},
+        {'selector': 'td', 'props': [('text-align', 'center'), ('vertical-align', 'middle')]},
     ])
     
     st.table(styled_df)
+    display_property_descriptions()
 
 def display_radar_plot(selected_data):
     df = pd.DataFrame([m["properties"] for m in selected_data])
@@ -194,6 +199,7 @@ def display_radar_plot(selected_data):
     )
 
     st.plotly_chart(fig, use_container_width=True)
+    display_property_descriptions()
     
 def main():
     # Inject JavaScript for dimension detection
@@ -243,10 +249,10 @@ def main():
     """, unsafe_allow_html=True)
 
     # Detect orientation
-    width = st.experimental_get_query_params().get('width', [0])[0]
-    height = st.experimental_get_query_params().get('height', [0])[0]
+    width = int(st.experimental_get_query_params().get('width', [0])[0])
+    height = int(st.experimental_get_query_params().get('height', [0])[0])
     
-    st.session_state.is_portrait = int(height) > int(width)
+    st.session_state.is_portrait = height > width
 
     st.title("Molecular Property Viewer")
 
