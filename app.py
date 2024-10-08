@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
+import altair as alt
 
 # Define molecules and their properties
 molecules = [
@@ -61,26 +61,24 @@ else:  # Radar Plot
     df = pd.DataFrame([m["properties"] for m in molecules if m["name"] in selected_molecules])
     df.index = selected_molecules
 
-    fig = go.Figure()
+    # Prepare data for Altair
+    df_melted = df.reset_index().melt(id_vars='index', var_name='property', value_name='value')
+    df_melted = df_melted.rename(columns={'index': 'molecule'})
 
-    for mol in df.index:
-        fig.add_trace(go.Scatterpolar(
-            r=df.loc[mol],
-            theta=df.columns,
-            fill='toself',
-            name=mol
-        ))
-
-    fig.update_layout(
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, 3]
-            )),
-        showlegend=True
+    # Create Radar Plot using Altair
+    base = alt.Chart(df_melted).encode(
+        theta=alt.Theta('property:N', sort=None),
+        radius=alt.Radius('value:Q', scale=alt.Scale(type='sqrt', zero=True, rangeMin=20)),
+        color='molecule:N'
     )
-
-    st.plotly_chart(fig)
+    
+    chart = base.mark_line(closed=True).encode(
+        alt.OpacityValue(0.2)
+    ) + base.mark_point().encode(
+        alt.OpacityValue(0.8)
+    )
+    
+    st.altair_chart(chart, use_container_width=True)
 
 # Property descriptions
 st.subheader("Property Descriptions")
