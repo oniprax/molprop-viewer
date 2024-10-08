@@ -80,13 +80,13 @@ if 'selected_molecules' not in st.session_state:
 
 def display_property_descriptions():
     st.subheader("Property Descriptions")
-    for prop, desc in property_descriptions.items():
-        st.markdown(f"- **{prop}**: {desc}")
+    descriptions = ["- **{}**: {}".format(prop, desc) for prop, desc in property_descriptions.items()]
+    st.markdown("\n".join(descriptions), unsafe_allow_html=True)
 
 def molecule_selection_page():
     st.subheader("Select Molecules (up to 5)")
 
-    layout = get_layout()
+    layout = 3 if st.session_state.is_portrait else 5
     molecule_size = 150
 
     for i in range(0, len(molecules), layout):
@@ -95,19 +95,37 @@ def molecule_selection_page():
             if i + j < len(molecules):
                 molecule = molecules[i + j]
                 with cols[j]:
-                    selected = st.checkbox("", key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
-                    svg = mol_to_svg(molecule['smiles'], size=molecule_size)
-                    if svg != "Invalid SMILES":
-                        st.components.v1.html(svg, height=molecule_size, width=molecule_size)
-                    else:
-                        st.warning(f"Could not render molecule: {molecule['name']}")
-                    st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 16px;'>{molecule['name']}</p>", unsafe_allow_html=True)
+                    col1, col2 = st.columns([1, 4])
+                    with col1:
+                        selected = st.checkbox("", key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
+                    with col2:
+                        svg = mol_to_svg(molecule['smiles'], size=molecule_size)
+                        if svg != "Invalid SMILES":
+                            st.components.v1.html(svg, height=molecule_size, width=molecule_size)
+                        else:
+                            st.warning(f"Could not render molecule: {molecule['name']}")
+                        st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 16px;'>{molecule['name']}</p>", unsafe_allow_html=True)
                 
                 if selected and molecule['name'] not in st.session_state.selected_molecules:
                     if len(st.session_state.selected_molecules) < 5:
                         st.session_state.selected_molecules.append(molecule['name'])
                 elif not selected and molecule['name'] in st.session_state.selected_molecules:
                     st.session_state.selected_molecules.remove(molecule['name'])
+
+    # Add JavaScript to detect orientation changes
+    st.markdown("""
+    <script>
+    const reportWindowSize = function() {
+        if (window.innerWidth > window.innerHeight) {
+            window.parent.postMessage({type: 'streamlit:setComponentValue', value: false}, '*');
+        } else {
+            window.parent.postMessage({type: 'streamlit:setComponentValue', value: true}, '*');
+        }
+    }
+    window.onresize = reportWindowSize;
+    reportWindowSize();
+    </script>
+    """, unsafe_allow_html=True)
 
     if st.button("View Properties", key='view_properties') and st.session_state.selected_molecules:
         st.session_state.page = 'property_view'
@@ -159,7 +177,7 @@ def display_traffic_light(selected_data):
         {'selector': 'td', 'props': [('text-align', 'center'), ('vertical-align', 'middle')]},
     ])
     
-    st.table(styled_df)
+    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
     display_property_descriptions()
 
 def display_radar_plot(selected_data):
@@ -249,10 +267,11 @@ def main():
     """, unsafe_allow_html=True)
 
     # Detect orientation
-    width = int(st.experimental_get_query_params().get('width', [0])[0])
-    height = int(st.experimental_get_query_params().get('height', [0])[0])
-    
-    st.session_state.is_portrait = height > width
+    if 'is_portrait' not in st.session_state:
+        st.session_state.is_portrait = False
+
+    # Add a hidden checkbox to trigger rerun on orientation change
+    st.checkbox("Trigger rerun", value=False, key="trigger_rerun", label_visibility="hidden")
 
     st.title("Molecular Property Viewer")
 
