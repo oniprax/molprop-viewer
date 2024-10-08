@@ -168,7 +168,7 @@ def display_radar_plot(selected_data):
 def display_property_descriptions():
     st.subheader("Property Descriptions")
     st.markdown(
-        "<style>div[data-testid='stMarkdownContainer'] ul { font-size: 10px; }</style>",
+        "<style>div[data-testid='stMarkdownContainer'] ul { font-size: 9px; }</style>",
         unsafe_allow_html=True
     )
     for prop, desc in property_descriptions.items():
