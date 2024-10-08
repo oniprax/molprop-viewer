@@ -131,14 +131,15 @@ def display_radar_plot(selected_data):
     fig = go.Figure()
 
     for i, molecule in enumerate(df.index):
+        color = color_palette[i % len(color_palette)]
         fig.add_trace(go.Scatterpolar(
             r=df.loc[molecule].values.tolist() + [df.loc[molecule].values[0]],
             theta=df.columns.tolist() + [df.columns[0]],
             fill='toself',
             name=molecule,
-            line_color=color_palette[i % len(color_palette)],
-            fillcolor=color_palette[i % len(color_palette)],
-            opacity=0.6
+            line_color=color,
+            fillcolor=color,
+            opacity=0.7  # Adjust this value to change transparency (0.0 to 1.0)
         ))
 
     fig.update_layout(
@@ -166,6 +167,10 @@ def display_radar_plot(selected_data):
 
 def display_property_descriptions():
     st.subheader("Property Descriptions")
+    st.markdown(
+        "<style>div[data-testid='stMarkdownContainer'] ul { font-size: 14px; }</style>",
+        unsafe_allow_html=True
+    )
     for prop, desc in property_descriptions.items():
         st.markdown(f"- **{prop}**: {desc}")
 
