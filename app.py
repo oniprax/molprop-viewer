@@ -87,7 +87,7 @@ def molecule_selection_page():
 def property_view_page():
     if st.button("← Back to Selection"):
         st.session_state.page = 'selection'
-        st.experimental_rerun()
+        st.rerun()
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
 
@@ -97,6 +97,11 @@ def property_view_page():
         display_traffic_light(selected_data)
     else:
         display_radar_plot(selected_data)
+
+    # Display molecular structures
+    st.subheader("Molecular Structures")
+    for mol in selected_data:
+        st.image(f"https://cactus.nci.nih.gov/chemical/structure/{mol['smiles']}/image", caption=mol['name'])
 
 def display_traffic_light(selected_data):
     for prop in property_descriptions.keys():
