@@ -10,17 +10,8 @@ import base64
 import math
 
 def get_layout():
-    # Use st.session_state to store and retrieve the current layout
-    if 'current_layout' not in st.session_state:
-        st.session_state.current_layout = 5  # Default to 5 columns
-
-    # Check if width is greater than height
-    if st.session_state.get('is_landscape', True):
-        st.session_state.current_layout = 5  # 5 columns in landscape
-    else:
-        st.session_state.current_layout = 3  # 3 columns in portrait
-
-    return st.session_state.current_layout
+    # Use the session state to determine the layout
+    return 3 if st.session_state.get('is_portrait', False) else 5
     
 # Define molecules and their properties
 molecules = [
@@ -88,75 +79,25 @@ if 'page' not in st.session_state:
 if 'selected_molecules' not in st.session_state:
     st.session_state.selected_molecules = []
 
-def main():
-    # Inject JavaScript for dimension detection
-    st.markdown(
-        """
-        <script>
-        function updateDimensions() {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const params = new URLSearchParams(window.location.search);
-            params.set('width', width);
-            params.set('height', height);
-            window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
-            window.dispatchEvent(new Event('resize'));
-        }
-        window.addEventListener('load', updateDimensions);
-        window.addEventListener('resize', updateDimensions);
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Detect orientation
-    width = st.session_state.get('width', 0)
-    height = st.session_state.get('height', 0)
-    
-    if width != 0 and height != 0:
-        st.session_state.is_landscape = width > height
-        
-    st.markdown("""
-<style>
-    .stApp {
-        max-width: 100%;
-        padding: 1rem;
-    }
-    .element-container {
-        width: 100% !important;
-    }
-    .element-container > div {
-        width: 100% !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .element-container svg {
-        max-width: 100%;
-        height: auto;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-    st.title("Molecular Property Viewer")
-
-    if st.session_state.page == 'selection':
-        molecule_selection_page()
-    elif st.session_state.page == 'property_view':
-        property_view_page()
-
 def molecule_selection_page():
     st.subheader("Select Molecules (up to 5)")
 
-    cols = st.columns(get_layout())
+    layout = get_layout()
+    cols = st.columns(layout)
+    
     for i, molecule in enumerate(molecules):
-        with cols[i % len(cols)]:
-            selected = st.checkbox(molecule['name'], key=f"mol_{i}")
-            svg = mol_to_svg(molecule['smiles'], size=150)
-            if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=150, width=150)
-            else:
-                st.warning(f"Could not render molecule: {molecule['name']}")
+        with cols[i % layout]:
+            col1, col2 = st.columns([1, 3])
+            with col1:
+                selected = st.checkbox("", key=f"mol_{i}", value=molecule['name'] in st.session_state.selected_molecules)
+            with col2:
+                svg = mol_to_svg(molecule['smiles'], size=120 if layout == 3 else 150)
+                if svg != "Invalid SMILES":
+                    st.components.v1.html(svg, height=120 if layout == 3 else 150, width=120 if layout == 3 else 150)
+                else:
+                    st.warning(f"Could not render molecule: {molecule['name']}")
+                st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 12px;'>{molecule['name']}</p>", unsafe_allow_html=True)
+            
             if selected and molecule['name'] not in st.session_state.selected_molecules:
                 if len(st.session_state.selected_molecules) < 5:
                     st.session_state.selected_molecules.append(molecule['name'])
@@ -258,6 +199,72 @@ def display_radar_plot(selected_data):
     )
 
     st.plotly_chart(fig, use_container_width=True)
+    
+def main():
+    st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
+
+    # Inject JavaScript for dimension detection
+    st.markdown(
+        """
+        <script>
+        function updateDimensions() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const params = new URLSearchParams(window.location.search);
+            params.set('width', width);
+            params.set('height', height);
+            window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+            window.dispatchEvent(new Event('resize'));
+        }
+        window.addEventListener('load', updateDimensions);
+        window.addEventListener('resize', updateDimensions);
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Add responsive CSS
+    st.markdown("""
+    <style>
+        .stApp {
+            max-width: 100%;
+            padding: 1rem;
+        }
+        .element-container {
+            width: 100% !important;
+        }
+        .element-container > div {
+            width: 100% !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .element-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Detect orientation
+    width = st.experimental_get_query_params().get('width', [0])[0]
+    height = st.experimental_get_query_params().get('height', [0])[0]
+    
+    st.session_state.is_portrait = int(height) > int(width)
+
+    st.title("Molecular Property Viewer")
+
+    # Initialize selected_molecules if not present
+    if 'selected_molecules' not in st.session_state:
+        st.session_state.selected_molecules = []
+
+    if 'page' not in st.session_state:
+        st.session_state.page = 'selection'
+
+    if st.session_state.page == 'selection':
+        molecule_selection_page()
+    elif st.session_state.page == 'property_view':
+        property_view_page()
 
 if __name__ == "__main__":
     main()
