@@ -109,9 +109,9 @@ def molecule_selection_page():
                 elif not selected and molecule['name'] in st.session_state.selected_molecules:
                     st.session_state.selected_molecules.remove(molecule['name'])
 
-    # if st.button("View Properties", key='view_properties') and st.session_state.selected_molecules:
-    #     st.session_state.page = 'property_view'
-    #     st.rerun()
+    if st.button("View Properties", key='view_properties') and st.session_state.selected_molecules:
+        st.session_state.page = 'property_view'
+        st.rerun()
 
 def property_view_page():
     if st.button("← Back to Selection"):
