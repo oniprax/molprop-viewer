@@ -3,6 +3,7 @@ import pandas as pd
 import altair as alt
 from rdkit import Chem
 from rdkit.Chem import Draw
+from rdkit.Chem import AllChem
 import plotly.graph_objects as go
 import io
 import base64
@@ -63,7 +64,13 @@ def get_traffic_light_color(property_name, value):
 
 def mol_to_svg(smiles):
     mol = Chem.MolFromSmiles(smiles)
-    return Draw.MolToSVG(mol)
+    if mol is not None:
+        mol = Chem.AddHs(mol)
+        AllChem.Compute2DCoords(mol)
+        mol = Chem.RemoveHs(mol)
+        return Draw.MolToSVG(mol)
+    else:
+        return "Invalid SMILES"
 
 st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
 
@@ -116,7 +123,10 @@ def molecule_selection_page():
         with cols[i % len(cols)]:
             selected = st.checkbox(molecule['name'], key=f"mol_{i}")
             svg = mol_to_svg(molecule['smiles'])
-            st.components.v1.html(svg, height=200)
+            if svg != "Invalid SMILES":
+                st.components.v1.html(svg, height=200)
+            else:
+                st.warning(f"Could not render molecule: {molecule['name']}")
             if selected and molecule['name'] not in st.session_state.selected_molecules:
                 if len(st.session_state.selected_molecules) < 5:
                     st.session_state.selected_molecules.append(molecule['name'])
@@ -140,7 +150,10 @@ def property_view_page():
     for i, mol in enumerate(selected_data):
         with cols[i]:
             svg = mol_to_svg(mol['smiles'])
-            st.components.v1.html(svg, height=200)
+            if svg != "Invalid SMILES":
+                st.components.v1.html(svg, height=200)
+            else:
+                st.warning(f"Could not render molecule: {mol['name']}")
             st.markdown(f"<p style='text-align: center; font-weight: bold;'>{mol['name']}</p>", unsafe_allow_html=True)
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
@@ -149,7 +162,7 @@ def property_view_page():
         display_traffic_light(selected_data)
     else:
         display_radar_plot(selected_data)
-
+        
 def display_traffic_light(selected_data):
     df = pd.DataFrame([m['properties'] for m in selected_data])
     df.index = [m['name'] for m in selected_data]
