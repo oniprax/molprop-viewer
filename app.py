@@ -3,7 +3,7 @@ import pandas as pd
 import altair as alt
 from rdkit import Chem
 from rdkit.Chem import Draw
-from rdkit.Chem import AllChem
+from rdkit.Chem import rdDepictor
 import plotly.graph_objects as go
 import io
 import base64
@@ -62,16 +62,18 @@ def get_traffic_light_color(property_name, value):
     else:
         return "green"
 
-def mol_to_svg(smiles):
+def mol_to_svg(smiles, molSize=(300,300)):
     mol = Chem.MolFromSmiles(smiles)
     if mol is not None:
-        mol = Chem.AddHs(mol)
-        AllChem.Compute2DCoords(mol)
-        mol = Chem.RemoveHs(mol)
-        return Draw.MolToSVG(mol)
+        rdDepictor.Compute2DCoords(mol)
+        drawer = Draw.MolDraw2DSVG(molSize[0], molSize[1])
+        drawer.DrawMolecule(mol)
+        drawer.FinishDrawing()
+        svg = drawer.GetDrawingText()
+        return svg.replace('svg:', '')
     else:
         return "Invalid SMILES"
-
+        
 st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
 
 # Initialize session state
@@ -124,7 +126,7 @@ def molecule_selection_page():
             selected = st.checkbox(molecule['name'], key=f"mol_{i}")
             svg = mol_to_svg(molecule['smiles'])
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=200)
+                st.components.v1.html(svg, height=300)
             else:
                 st.warning(f"Could not render molecule: {molecule['name']}")
             if selected and molecule['name'] not in st.session_state.selected_molecules:
@@ -151,7 +153,7 @@ def property_view_page():
         with cols[i]:
             svg = mol_to_svg(mol['smiles'])
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=200)
+                st.components.v1.html(svg, height=300)
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
             st.markdown(f"<p style='text-align: center; font-weight: bold;'>{mol['name']}</p>", unsafe_allow_html=True)
