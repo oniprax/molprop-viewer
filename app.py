@@ -61,12 +61,9 @@ def get_traffic_light_color(property_name, value):
     else:
         return "green"
 
-def mol_to_img(smiles):
+def mol_to_svg(smiles):
     mol = Chem.MolFromSmiles(smiles)
-    img = Draw.MolToImage(mol)
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    return base64.b64encode(buf.getvalue()).decode()
+    return Draw.MolToSVG(mol)
 
 st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
 
@@ -118,7 +115,8 @@ def molecule_selection_page():
     for i, molecule in enumerate(molecules):
         with cols[i % len(cols)]:
             selected = st.checkbox(molecule['name'], key=f"mol_{i}")
-            st.image(mol_to_img(molecule['smiles']), use_column_width=True)
+            svg = mol_to_svg(molecule['smiles'])
+            st.components.v1.html(svg, height=200)
             if selected and molecule['name'] not in st.session_state.selected_molecules:
                 if len(st.session_state.selected_molecules) < 5:
                     st.session_state.selected_molecules.append(molecule['name'])
@@ -141,7 +139,8 @@ def property_view_page():
     cols = st.columns(len(selected_data))
     for i, mol in enumerate(selected_data):
         with cols[i]:
-            st.image(mol_to_img(mol['smiles']), use_column_width=True)
+            svg = mol_to_svg(mol['smiles'])
+            st.components.v1.html(svg, height=200)
             st.markdown(f"<p style='text-align: center; font-weight: bold;'>{mol['name']}</p>", unsafe_allow_html=True)
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
