@@ -139,7 +139,7 @@ def display_radar_plot(selected_data):
             name=molecule,
             line_color=color,
             fillcolor=color,
-            opacity=0.7  # Adjust this value to change transparency (0.0 to 1.0)
+            opacity=0.8  # Adjust this value to change transparency (0.0 to 1.0)
         ))
 
     fig.update_layout(
@@ -168,7 +168,7 @@ def display_radar_plot(selected_data):
 def display_property_descriptions():
     st.subheader("Property Descriptions")
     st.markdown(
-        "<style>div[data-testid='stMarkdownContainer'] ul { font-size: 14px; }</style>",
+        "<style>div[data-testid='stMarkdownContainer'] ul { font-size: 12px; }</style>",
         unsafe_allow_html=True
     )
     for prop, desc in property_descriptions.items():
