@@ -122,20 +122,25 @@ def display_traffic_light(selected_data):
     # Create a styled dataframe
     def color_cells(val, prop):
         color = get_traffic_light_color(prop, val)
-        return f'background-color: {color}; color: black; font-weight: bold; text-align: center'
+        return f'background-color: {color}; color: black; font-weight: bold; text-align: center; vertical-align: middle;'
 
     styled_df = df.style.apply(lambda col: [color_cells(val, col.name) for val in col], axis=0)
     
-    # Center-align and bold the column names
+    # Center-align and bold the column names and index
     styled_df = styled_df.set_table_styles([
-        {'selector': 'th', 'props': [('font-weight', 'bold'), ('text-align', 'center')]},
-        {'selector': 'td', 'props': [('text-align', 'center')]}
+        {'selector': 'th', 'props': [('font-weight', 'bold'), ('text-align', 'center'), ('vertical-align', 'middle')]},
+        {'selector': 'td', 'props': [('text-align', 'center'), ('vertical-align', 'middle')]},
+        {'selector': 'tr:hover', 'props': [('background-color', 'lightgrey')]},
     ])
     
     # Bold and center the index (molecule names)
-    styled_df = styled_df.set_properties(**{'font-weight': 'bold', 'text-align': 'center'})
+    styled_df = styled_df.set_properties(**{'font-weight': 'bold', 'text-align': 'center', 'vertical-align': 'middle'})
     
-    st.table(styled_df)
+    # Convert to HTML and adjust cell padding
+    html = styled_df.to_html()
+    html = html.replace('<td', '<td style="padding: 10px;"')
+    
+    st.write(html, unsafe_allow_html=True)
 
 def display_radar_plot(selected_data):
     df = pd.DataFrame([m["properties"] for m in selected_data])
@@ -147,31 +152,27 @@ def display_radar_plot(selected_data):
 
     # Calculate angles for each property
     properties = list(df.columns)
-    angles = [i / len(properties) * 2 * math.pi for i in range(len(properties))]
+    n_properties = len(properties)
+    angles = [i / n_properties * 2 * math.pi for i in range(n_properties)]
     angles += angles[:1]  # Repeat the first angle to close the polygon
 
-    # Create the radar chart
-    chart = alt.Chart(df_melted).transform_calculate(
-        angle=f"indexof(datum.property, {properties}) / {len(properties)} * 2 * PI"
-    ).encode(
-        x=alt.X('x:Q', scale=alt.Scale(domain=[-1, 1])),
-        y=alt.Y('y:Q', scale=alt.Scale(domain=[-1, 1])),
-        color='molecule:N',
-        order='property'
-    ).transform_calculate(
-        x=alt.expr.cos(alt.datum.angle) + ' * datum.value / 5',
-        y=alt.expr.sin(alt.datum.angle) + ' * datum.value / 5'
+    # Create the base chart
+    base = alt.Chart(df_melted).encode(
+        theta=alt.Theta('property:N', sort=None, stack=None),
+        radius=alt.Radius('value:Q', scale=alt.Scale(type='sqrt', zero=True, rangeMin=20)),
+        color='molecule:N'
     )
 
-    lines = chart.mark_line(point=True).encode(
-        detail='molecule:N'
+    # Create the radar chart
+    lines = base.mark_line(point=True).encode(
+        order='property'
     )
 
     # Add circular grid lines
-    grid_data = pd.DataFrame({'radius': [0.2, 0.4, 0.6, 0.8, 1.0]})
+    grid_data = pd.DataFrame({'radius': [1, 2, 3, 4, 5]})
     grid = alt.Chart(grid_data).encode(
         theta=alt.Theta(datum=2 * math.pi, scale=alt.Scale(domain=[0, 2 * math.pi])),
-        radius=alt.Radius('radius:Q', scale=alt.Scale(domain=[0, 1]))
+        radius=alt.Radius('radius:Q', scale=alt.Scale(domain=[0, 5]))
     ).mark_circle(
         color='lightgray',
         strokeWidth=1,
@@ -183,17 +184,14 @@ def display_radar_plot(selected_data):
     labels = alt.Chart(pd.DataFrame({
         'property': properties,
         'angle': angles[:-1],
-        'x': [math.cos(angle) * 1.1 for angle in angles[:-1]],
-        'y': [math.sin(angle) * 1.1 for angle in angles[:-1]]
-    })).mark_text(
-        align='center',
-        baseline='middle'
-    ).encode(
-        x='x:Q',
-        y='y:Q',
-        text='property:N'
-    )
+        'radius': [5.5] * n_properties
+    })).encode(
+        text='property:N',
+        theta='angle:Q',
+        radius='radius:Q'
+    ).mark_text(align='center', baseline='middle')
 
+    # Combine all elements
     radar = (grid + lines + labels).properties(width=500, height=500)
 
     st.altair_chart(radar, use_container_width=True)
