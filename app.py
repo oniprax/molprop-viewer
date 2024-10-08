@@ -83,26 +83,28 @@ def molecule_selection_page():
     st.subheader("Select Molecules (up to 5)")
 
     layout = get_layout()
-    cols = st.columns(layout)
-    
-    for i, molecule in enumerate(molecules):
-        with cols[i % layout]:
-            col1, col2 = st.columns([1, 3])
-            with col1:
-                selected = st.checkbox("", key=f"mol_{i}", value=molecule['name'] in st.session_state.selected_molecules)
-            with col2:
-                svg = mol_to_svg(molecule['smiles'], size=120 if layout == 3 else 150)
-                if svg != "Invalid SMILES":
-                    st.components.v1.html(svg, height=120 if layout == 3 else 150, width=120 if layout == 3 else 150)
-                else:
-                    st.warning(f"Could not render molecule: {molecule['name']}")
-                st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 12px;'>{molecule['name']}</p>", unsafe_allow_html=True)
-            
-            if selected and molecule['name'] not in st.session_state.selected_molecules:
-                if len(st.session_state.selected_molecules) < 5:
-                    st.session_state.selected_molecules.append(molecule['name'])
-            elif not selected and molecule['name'] in st.session_state.selected_molecules:
-                st.session_state.selected_molecules.remove(molecule['name'])
+    molecule_size = 120 if layout == 3 else 150
+    font_size = 14 if layout == 3 else 16
+
+    for i in range(0, len(molecules), layout):
+        cols = st.columns(layout)
+        for j, col in enumerate(cols):
+            if i + j < len(molecules):
+                molecule = molecules[i + j]
+                with col:
+                    selected = st.checkbox(molecule['name'], key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
+                    svg = mol_to_svg(molecule['smiles'], size=molecule_size)
+                    if svg != "Invalid SMILES":
+                        st.components.v1.html(svg, height=molecule_size, width=molecule_size)
+                    else:
+                        st.warning(f"Could not render molecule: {molecule['name']}")
+                    st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: {font_size}px;'>{molecule['name']}</p>", unsafe_allow_html=True)
+                
+                if selected and molecule['name'] not in st.session_state.selected_molecules:
+                    if len(st.session_state.selected_molecules) < 5:
+                        st.session_state.selected_molecules.append(molecule['name'])
+                elif not selected and molecule['name'] in st.session_state.selected_molecules:
+                    st.session_state.selected_molecules.remove(molecule['name'])
 
     if st.button("View Properties", key='view_properties') and st.session_state.selected_molecules:
         st.session_state.page = 'property_view'
@@ -213,6 +215,9 @@ def main():
             params.set('height', height);
             window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
             window.dispatchEvent(new Event('resize'));
+            if (window.streamlitPyCallbacks) {
+                window.streamlitPyCallbacks.onResize(width, height);
+            }
         }
         window.addEventListener('load', updateDimensions);
         window.addEventListener('resize', updateDimensions);
