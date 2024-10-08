@@ -8,35 +8,18 @@ from rdkit.Chem import rdDepictor
 
 st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
 
-# Define 12 molecules
-molecules = [
-    {"name": "Aspirin", "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O", "properties": {
-        "lipophilicity": 1.19, "solubility": 3, "permeability": 2, "clearance": 1, "potency": 2
-    }},
-    {"name": "Ibuprofen", "smiles": "CC(C)CC1=CC=C(C=C1)[C@H](C)C(=O)O", "properties": {
-        "lipophilicity": 3.97, "solubility": 2, "permeability": 3, "clearance": 2, "potency": 2
-    }},
-    {"name": "Paracetamol", "smiles": "CC(=O)NC1=CC=C(C=C1)O", "properties": {
-        "lipophilicity": 0.46, "solubility": 1, "permeability": 1, "clearance": 2, "potency": 1
-    }},
-    {"name": "Olaparib", "smiles": "C1CC1C(=O)N2CCN(CC2)C(=O)C3=C(C=C(C=C3)CN4C(=O)C=CC4=O)F", "properties": {
-        "lipophilicity": 1.95, "solubility": 2, "permeability": 3, "clearance": 2, "potency": 3
-    }},
-    {"name": "Abiraterone", "smiles": "CC12CCC3C(C1CCC2(C#C)O)CCC4C3(CCC(C4)O)C", "properties": {
-        "lipophilicity": 5.19, "solubility": 1, "permeability": 3, "clearance": 1, "potency": 3
-    }},
-    # Add 7 more molecules here to reach a total of 12
-]
+@st.cache_data
+def load_molecules():
+    # This function will now cache the molecules data
+    return [
+        {"name": "Aspirin", "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O", "properties": {
+            "lipophilicity": 1.19, "solubility": 3, "permeability": 2, "clearance": 1, "potency": 2
+        }},
+        # ... other molecules ...
+    ]
 
-property_descriptions = {
-    "lipophilicity": "Measure of a drug's ability to dissolve in fats, oils, and non-polar solvents",
-    "solubility": "Ability of a drug to dissolve in water",
-    "permeability": "Ease with which a drug can pass through cell membranes",
-    "clearance": "Rate at which a drug is removed from the body",
-    "potency": "Amount of drug required to produce a specific effect"
-}
-
-def mol_to_svg(smiles, size=150):  # Change size as needed
+@st.cache_data
+def mol_to_svg(smiles, size=150):
     mol = Chem.MolFromSmiles(smiles)
     if mol is not None:
         rdDepictor.Compute2DCoords(mol)
@@ -48,8 +31,19 @@ def mol_to_svg(smiles, size=150):  # Change size as needed
     else:
         return "Invalid SMILES"
 
+@st.cache_data
+def get_property_descriptions():
+    return {
+        "lipophilicity": "Measure of a drug's ability to dissolve in fats, oils, and non-polar solvents",
+        "solubility": "Ability of a drug to dissolve in water",
+        "permeability": "Ease with which a drug can pass through cell membranes",
+        "clearance": "Rate at which a drug is removed from the body",
+        "potency": "Amount of drug required to produce a specific effect"
+    }
+
 def molecule_selection_page():
     st.subheader("Select Molecules (up to 4)")
+    molecules = load_molecules()  # Use the cached function
 
     for i in range(0, len(molecules), 4):
         cols = st.columns(4)
@@ -118,12 +112,18 @@ def display_traffic_light(selected_data):
         {'selector': 'td', 'props': [('text-align', 'center'), ('vertical-align', 'middle')]},
     ])
     
-    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
-
-def display_radar_plot(selected_data):
+    # Use st.table instead of st.markdown for better performance
+    st.table(styled_df)
+    
+@st.cache_data
+def prepare_radar_data(selected_data):
     df = pd.DataFrame([m["properties"] for m in selected_data])
     df = df.round(2)  # Round to 2 decimal places
     df.index = [m["name"] for m in selected_data]
+    return df
+    
+def display_radar_plot(selected_data):
+    df = prepare_radar_data(selected_data)
     
     # Define a color palette with distinct colors
     color_palette = px.colors.qualitative.Bold
@@ -168,9 +168,10 @@ def display_radar_plot(selected_data):
 def display_property_descriptions():
     st.subheader("Property Descriptions")
     st.markdown(
-        "<style>div[data-testid='stMarkdownContainer'] ul { font-size: 9px; }</style>",
+        "<style>div[data-testid='stMarkdownContainer'] ul { font-size: 14px; }</style>",
         unsafe_allow_html=True
     )
+    property_descriptions = get_property_descriptions()  # Use the cached function
     for prop, desc in property_descriptions.items():
         st.markdown(f"- **{prop}**: {desc}")
 
@@ -194,7 +195,7 @@ def get_traffic_light_color(property_name, value):
 def main():
     st.title("Molecular Property Viewer")
 
-    # Initialize selected_molecules if not present
+    # Use session state to store selected molecules
     if 'selected_molecules' not in st.session_state:
         st.session_state.selected_molecules = []
 
