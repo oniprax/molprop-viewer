@@ -73,8 +73,6 @@ def mol_to_svg(smiles, size=150):
     else:
         return "Invalid SMILES"
         
-st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
-
 # Initialize session state
 if 'page' not in st.session_state:
     st.session_state.page = 'selection'
