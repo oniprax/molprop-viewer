@@ -146,7 +146,7 @@ def display_traffic_light(selected_data):
                 vertical-align: middle;
             }}
         </style>
-        {html}
+        # {html}
     </div>
     """
     
