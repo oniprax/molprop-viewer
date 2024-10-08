@@ -55,7 +55,7 @@ def get_property_descriptions():
 
 def molecule_selection_page():
     st.subheader("Select Molecules (up to 4)")
-    molecules = load_molecules()  # Use the cached function
+    molecules = load_molecules()
 
     for i in range(0, len(molecules), 4):
         cols = st.columns(4)
@@ -66,7 +66,7 @@ def molecule_selection_page():
                     selected = st.checkbox("", key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
                     svg = mol_to_svg(molecule['smiles'])
                     if svg != "Invalid SMILES":
-                        st.components.v1.html(svg, height=150, width=150) # change size as needed
+                        st.components.v1.html(svg, height=150, width=150)
                     else:
                         st.warning(f"Could not render molecule: {molecule['name']}")
                     st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 18px;'>{molecule['name']}</p>", unsafe_allow_html=True)
@@ -86,6 +86,7 @@ def property_view_page():
         st.session_state.page = 'selection'
         st.rerun()
 
+    molecules = load_molecules()
     selected_data = [m for m in molecules if m['name'] in st.session_state.selected_molecules]
 
     # Display selected molecules
@@ -95,7 +96,7 @@ def property_view_page():
         with cols[i]:
             svg = mol_to_svg(mol['smiles'])
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=150, width=150) # change size as needed
+                st.components.v1.html(svg, height=150, width=150)
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
             st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 18px;'>{mol['name']}</p>", unsafe_allow_html=True)
@@ -106,6 +107,8 @@ def property_view_page():
         display_traffic_light(selected_data)
     else:
         display_radar_plot(selected_data)
+
+    display_property_descriptions()
 
     display_property_descriptions()
 
