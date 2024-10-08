@@ -118,7 +118,14 @@ def display_traffic_light(selected_data):
     df = pd.DataFrame([m['properties'] for m in selected_data])
     df.index = [m['name'] for m in selected_data]
     
-    st.table(df.style.applymap(lambda x: f"background-color: {get_traffic_light_color(df.columns[df.values == x][0], x)}"))
+    # Create a styled dataframe
+    def color_cells(val, prop):
+        color = get_traffic_light_color(prop, val)
+        return f'background-color: {color}'
+
+    styled_df = df.style.apply(lambda col: [color_cells(val, col.name) for val in col], axis=0)
+    
+    st.table(styled_df)
 
 def display_radar_plot(selected_data):
     df = pd.DataFrame([m["properties"] for m in selected_data])
@@ -128,23 +135,56 @@ def display_radar_plot(selected_data):
     df_melted = df.reset_index().melt(id_vars='index', var_name='property', value_name='value')
     df_melted = df_melted.rename(columns={'index': 'molecule'})
 
+    # Calculate angles for each property
+    properties = list(df.columns)
+    angles = [i / len(properties) * 2 * math.pi for i in range(len(properties))]
+    angles += angles[:1]  # Repeat the first angle to close the polygon
+
     # Create the radar chart
     chart = alt.Chart(df_melted).transform_calculate(
-        angle=f"2 * PI * indexof(datum.property, {list(property_descriptions.keys())}) / {len(property_descriptions)}"
+        angle=f"indexof(datum.property, {properties}) / {len(properties)} * 2 * PI"
     ).encode(
-        x=alt.X('x:Q', scale=alt.Scale(nice=False, zero=True), axis=None),
-        y=alt.Y('y:Q', scale=alt.Scale(nice=False, zero=True), axis=None),
-        order='property',
-        color='molecule:N'
+        x=alt.X('x:Q', scale=alt.Scale(domain=[-1, 1])),
+        y=alt.Y('y:Q', scale=alt.Scale(domain=[-1, 1])),
+        color='molecule:N',
+        order='property'
     ).transform_calculate(
-        x=alt.datum.value * alt.expr.cos(alt.datum.angle),
-        y=alt.datum.value * alt.expr.sin(alt.datum.angle)
+        x=alt.expr.cos(alt.datum.angle) + ' * datum.value / 5',
+        y=alt.expr.sin(alt.datum.angle) + ' * datum.value / 5'
     )
 
-    points = chart.mark_point(size=100)
-    lines = chart.mark_line(point=alt.OverlayMarkDef(size=100))
+    lines = chart.mark_line(point=True).encode(
+        detail='molecule:N'
+    )
 
-    radar = (points + lines).properties(width=500, height=500)
+    # Add circular grid lines
+    grid_data = pd.DataFrame({'radius': [0.2, 0.4, 0.6, 0.8, 1.0]})
+    grid = alt.Chart(grid_data).encode(
+        theta=alt.Theta(datum=2 * math.pi, scale=alt.Scale(domain=[0, 2 * math.pi])),
+        radius=alt.Radius('radius:Q', scale=alt.Scale(domain=[0, 1]))
+    ).mark_circle(
+        color='lightgray',
+        strokeWidth=1,
+        opacity=0.5,
+        fill=None
+    )
+
+    # Add property labels
+    labels = alt.Chart(pd.DataFrame({
+        'property': properties,
+        'angle': angles[:-1],
+        'x': [math.cos(angle) * 1.1 for angle in angles[:-1]],
+        'y': [math.sin(angle) * 1.1 for angle in angles[:-1]]
+    })).mark_text(
+        align='center',
+        baseline='middle'
+    ).encode(
+        x='x:Q',
+        y='y:Q',
+        text='property:N'
+    )
+
+    radar = (grid + lines + labels).properties(width=500, height=500)
 
     st.altair_chart(radar, use_container_width=True)
 
