@@ -8,6 +8,13 @@ import io
 import base64
 import math
 
+def get_layout():
+    # Check if width is greater than height
+    if st.session_state.get('is_landscape', True):
+        return 5  # 5 columns in landscape
+    else:
+        return 3  # 3 columns in portrait
+
 # Define molecules and their properties
 molecules = [
     {"name": "Aspirin", "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O", "properties": {
@@ -70,6 +77,33 @@ if 'selected_molecules' not in st.session_state:
     st.session_state.selected_molecules = []
 
 def main():
+    # Inject JavaScript for dimension detection
+    st.markdown(
+        """
+        <script>
+        function updateDimensions() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const params = new URLSearchParams(window.location.search);
+            params.set('width', width);
+            params.set('height', height);
+            window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+            window.dispatchEvent(new Event('resize'));
+        }
+        window.addEventListener('load', updateDimensions);
+        window.addEventListener('resize', updateDimensions);
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Detect orientation
+    width = st.session_state.get('width', 0)
+    height = st.session_state.get('height', 0)
+    
+    if width != 0 and height != 0:
+        st.session_state.is_landscape = width > height
+
     st.title("Molecular Property Viewer")
 
     if st.session_state.page == 'selection':
@@ -80,11 +114,11 @@ def main():
 def molecule_selection_page():
     st.subheader("Select Molecules (up to 5)")
 
-    cols = st.columns(5)
+    cols = st.columns(get_layout())
     for i, molecule in enumerate(molecules):
-        with cols[i % 5]:
+        with cols[i % len(cols)]:
             selected = st.checkbox(molecule['name'], key=f"mol_{i}")
-            st.image(f"data:image/png;base64,{mol_to_img(molecule['smiles'])}", width=150)
+            st.image(mol_to_img(molecule['smiles']), use_column_width=True)
             if selected and molecule['name'] not in st.session_state.selected_molecules:
                 if len(st.session_state.selected_molecules) < 5:
                     st.session_state.selected_molecules.append(molecule['name'])
@@ -107,7 +141,8 @@ def property_view_page():
     cols = st.columns(len(selected_data))
     for i, mol in enumerate(selected_data):
         with cols[i]:
-            st.image(f"data:image/png;base64,{mol_to_img(mol['smiles'])}", caption=mol['name'], width=150)
+            st.image(mol_to_img(mol['smiles']), use_column_width=True)
+            st.markdown(f"<p style='text-align: center; font-weight: bold;'>{mol['name']}</p>", unsafe_allow_html=True)
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
 
@@ -163,10 +198,19 @@ def display_radar_plot(selected_data):
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[0, 5]
-            )),
+                range=[0, 5],
+                tickfont=dict(size=14)
+            ),
+            angularaxis=dict(
+                tickfont=dict(size=14)
+            )
+        ),
         showlegend=True,
-        title="Molecular Properties Comparison",
+        legend=dict(font=dict(size=14)),
+        title=dict(
+            text="Molecular Properties Comparison",
+            font=dict(size=20)
+        ),
         height=600,
         width=800
     )
