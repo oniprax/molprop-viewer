@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+from math import pi
 
 # Define molecules and their properties
 molecules = [
@@ -18,7 +19,8 @@ molecules = [
     }},
     {"name": "Abiraterone", "smiles": "CC12CCC3C(C1CCC2(C#C)O)CCC4C3(CCC(C4)O)C", "properties": {
         "lipophilicity": 5.19, "solubility": 1, "permeability": 3, "clearance": 1, "potency": 3
-    }}
+    }},
+    # Add 10 more molecules here to reach a total of 15
 ]
 
 property_descriptions = {
@@ -29,64 +31,105 @@ property_descriptions = {
     "potency": "Amount of drug required to produce a specific effect"
 }
 
-def get_traffic_light_color(value):
-    if value <= 1:
+# Thresholds for traffic light coloring (easily adjustable)
+thresholds = {
+    "lipophilicity": {"low": 2, "high": 4},
+    "solubility": {"low": 1, "high": 2},
+    "permeability": {"low": 1, "high": 2},
+    "clearance": {"low": 1, "high": 2},
+    "potency": {"low": 1, "high": 2}
+}
+
+def get_traffic_light_color(property_name, value):
+    low, high = thresholds[property_name]["low"], thresholds[property_name]["high"]
+    if value <= low:
         return "red"
-    elif value <= 2:
+    elif value <= high:
         return "yellow"
     else:
         return "green"
 
-st.title("Drug Property Viewer")
+st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
 
-# Molecule selection
-selected_molecules = st.multiselect("Select molecules (up to 5)", [m["name"] for m in molecules], default=["Aspirin"], max_selections=5)
+# Initialize session state
+if 'page' not in st.session_state:
+    st.session_state.page = 'selection'
+if 'selected_molecules' not in st.session_state:
+    st.session_state.selected_molecules = []
 
-# View toggle
-view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
+def main():
+    st.title("Molecular Property Viewer")
 
-# Display properties
-if view_type == "Traffic Light":
+    if st.session_state.page == 'selection':
+        molecule_selection_page()
+    elif st.session_state.page == 'property_view':
+        property_view_page()
+
+def molecule_selection_page():
+    st.subheader("Select Molecules (up to 5)")
+
+    # Determine number of columns based on orientation
+    cols = st.columns(5 if st.session_state.get('is_landscape', True) else 3)
+    
+    for i, molecule in enumerate(molecules):
+        with cols[i % len(cols)]:
+            selected = st.checkbox(molecule['name'], key=f"mol_{i}")
+            st.image(f"https://cactus.nci.nih.gov/chemical/structure/{molecule['smiles']}/image", width=150)
+            if selected and molecule['name'] not in st.session_state.selected_molecules:
+                if len(st.session_state.selected_molecules) < 5:
+                    st.session_state.selected_molecules.append(molecule['name'])
+            elif not selected and molecule['name'] in st.session_state.selected_molecules:
+                st.session_state.selected_molecules.remove(molecule['name'])
+
+    if st.button("View Properties") and st.session_state.selected_molecules:
+        st.session_state.page = 'property_view'
+
+def property_view_page():
+    if st.button("← Back to Selection"):
+        st.session_state.page = 'selection'
+        st.experimental_rerun()
+
+    view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
+
+    selected_data = [m for m in molecules if m['name'] in st.session_state.selected_molecules]
+
+    if view_type == "Traffic Light":
+        display_traffic_light(selected_data)
+    else:
+        display_radar_plot(selected_data)
+
+def display_traffic_light(selected_data):
     for prop in property_descriptions.keys():
         st.subheader(prop)
-        cols = st.columns(len(selected_molecules))
-        for i, mol_name in enumerate(selected_molecules):
-            mol = next(m for m in molecules if m["name"] == mol_name)
+        cols = st.columns(len(selected_data))
+        for i, mol in enumerate(selected_data):
             value = mol["properties"][prop]
-            color = get_traffic_light_color(value)
-            cols[i].markdown(f"<h3 style='text-align: center; color: {color};'>{mol_name}</h3>", unsafe_allow_html=True)
+            color = get_traffic_light_color(prop, value)
+            font_size = max(10, int(20 / len(selected_data)))  # Adjust font size based on number of molecules
+            cols[i].markdown(f"<h3 style='text-align: center; color: {color}; font-size: {font_size}px;'>{mol['name']}</h3>", unsafe_allow_html=True)
             cols[i].markdown(f"<div style='width: 50px; height: 50px; border-radius: 25px; background-color: {color}; margin: auto;'></div>", unsafe_allow_html=True)
 
-else:  # Radar Plot
-    df = pd.DataFrame([m["properties"] for m in molecules if m["name"] in selected_molecules])
-    df.index = selected_molecules
-
-    # Prepare data for Altair
+def display_radar_plot(selected_data):
+    df = pd.DataFrame([m["properties"] for m in selected_data])
+    df.index = [m["name"] for m in selected_data]
     df_melted = df.reset_index().melt(id_vars='index', var_name='property', value_name='value')
     df_melted = df_melted.rename(columns={'index': 'molecule'})
 
-    # Create Radar Plot using Altair
-    base = alt.Chart(df_melted).encode(
-        theta=alt.Theta('property:N', sort=None),
-        radius=alt.Radius('value:Q', scale=alt.Scale(type='sqrt', zero=True, rangeMin=20)),
-        color='molecule:N'
+    chart = alt.Chart(df_melted).transform_calculate(
+        angle=f"datum.property === '{df_melted['property'].iloc[-1]}' ? 0 : 2 * PI * (datum.property_index + 1) / {len(df_melted['property'].unique())}"
+    ).mark_line(point=True).encode(
+        x=alt.X('x:Q', axis=None),
+        y=alt.Y('y:Q', axis=None),
+        color='molecule:N',
+        order='property_index:Q',
+        detail='molecule:N'
+    ).transform_calculate(
+        property_index="indexof(datum.property, datum.property)",
+        x=f"datum.value * cos(2 * PI * datum.property_index / {len(df_melted['property'].unique())})",
+        y=f"datum.value * sin(2 * PI * datum.property_index / {len(df_melted['property'].unique())})"
     )
-    
-    chart = base.mark_line(closed=True).encode(
-        alt.OpacityValue(0.2)
-    ) + base.mark_point().encode(
-        alt.OpacityValue(0.8)
-    )
-    
+
     st.altair_chart(chart, use_container_width=True)
 
-# Property descriptions
-st.subheader("Property Descriptions")
-for prop, desc in property_descriptions.items():
-    st.markdown(f"**{prop}**: {desc}")
-
-# Display molecular structures
-st.subheader("Molecular Structures")
-for mol_name in selected_molecules:
-    mol = next(m for m in molecules if m["name"] == mol_name)
-    st.image(f"https://cactus.nci.nih.gov/chemical/structure/{mol['smiles']}/image", caption=mol_name)
+if __name__ == "__main__":
+    main()
