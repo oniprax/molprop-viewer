@@ -10,12 +10,18 @@ import base64
 import math
 
 def get_layout():
+    # Use st.session_state to store and retrieve the current layout
+    if 'current_layout' not in st.session_state:
+        st.session_state.current_layout = 5  # Default to 5 columns
+
     # Check if width is greater than height
     if st.session_state.get('is_landscape', True):
-        return 5  # 5 columns in landscape
+        st.session_state.current_layout = 5  # 5 columns in landscape
     else:
-        return 3  # 3 columns in portrait
+        st.session_state.current_layout = 3  # 3 columns in portrait
 
+    return st.session_state.current_layout
+    
 # Define molecules and their properties
 molecules = [
     {"name": "Aspirin", "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O", "properties": {
@@ -62,11 +68,11 @@ def get_traffic_light_color(property_name, value):
     else:
         return "green"
 
-def mol_to_svg(smiles, molSize=(300,300)):
+def mol_to_svg(smiles, size=150):
     mol = Chem.MolFromSmiles(smiles)
     if mol is not None:
         rdDepictor.Compute2DCoords(mol)
-        drawer = Draw.MolDraw2DSVG(molSize[0], molSize[1])
+        drawer = Draw.MolDraw2DSVG(size, size)
         drawer.DrawMolecule(mol)
         drawer.FinishDrawing()
         svg = drawer.GetDrawingText()
@@ -109,6 +115,28 @@ def main():
     
     if width != 0 and height != 0:
         st.session_state.is_landscape = width > height
+        
+    st.markdown("""
+<style>
+    .stApp {
+        max-width: 100%;
+        padding: 1rem;
+    }
+    .element-container {
+        width: 100% !important;
+    }
+    .element-container > div {
+        width: 100% !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .element-container svg {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+""", unsafe_allow_html=True)
 
     st.title("Molecular Property Viewer")
 
@@ -124,9 +152,9 @@ def molecule_selection_page():
     for i, molecule in enumerate(molecules):
         with cols[i % len(cols)]:
             selected = st.checkbox(molecule['name'], key=f"mol_{i}")
-            svg = mol_to_svg(molecule['smiles'])
+            svg = mol_to_svg(molecule['smiles'], size=150)
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=300)
+                st.components.v1.html(svg, height=150, width=150)
             else:
                 st.warning(f"Could not render molecule: {molecule['name']}")
             if selected and molecule['name'] not in st.session_state.selected_molecules:
@@ -151,12 +179,12 @@ def property_view_page():
     cols = st.columns(len(selected_data))
     for i, mol in enumerate(selected_data):
         with cols[i]:
-            svg = mol_to_svg(mol['smiles'])
+            svg = mol_to_svg(mol['smiles'], size=120)
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=300)
+                st.components.v1.html(svg, height=120, width=120)
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
-            st.markdown(f"<p style='text-align: center; font-weight: bold;'>{mol['name']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 14px;'>{mol['name']}</p>", unsafe_allow_html=True)
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
 
