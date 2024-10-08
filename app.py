@@ -116,7 +116,7 @@ def display_traffic_light(selected_data):
     
     def color_cells(val, prop):
         color = get_traffic_light_color(prop, float(val))
-        return f'background-color: {color}; color: black; text-align: center; vertical-align: middle;'
+        return f'background-color: {color}; color: black;'
 
     styled_df = df.style.apply(lambda col: [color_cells(val, col.name) for val in col], axis=0)
     
@@ -127,30 +127,23 @@ def display_traffic_light(selected_data):
         {'selector': '.row_heading', 'props': [('text-align', 'center'), ('font-weight', 'bold')]},
     ])
     
-    # Convert to HTML and adjust cell padding
-    html = styled_df.to_html()
-    html = html.replace('<td', '<td style="padding: 10px;"')
-    html = html.replace('<th', '<th style="padding: 10px;"')
+    # Use Streamlit's native table function with custom CSS
+    st.markdown("""
+    <style>
+        .stTable {
+            width: 100%;
+            text-align: center;
+        }
+        .stTable th {
+            text-align: center !important;
+        }
+        .stTable td {
+            text-align: center !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
     
-    # Wrap the table in a div with custom CSS for center alignment
-    centered_html = f"""
-    <div style="display: flex; justify-content: center;">
-        <style>
-            table {{
-                border-collapse: collapse;
-                margin: 0 auto;
-            }}
-            th, td {{
-                border: 1px solid black;
-                text-align: center;
-                vertical-align: middle;
-            }}
-        </style>
-        {html}
-    </div>
-    """
-    
-    st.markdown(centered_html, unsafe_allow_html=True)
+    st.table(styled_df)
     
 @st.cache_data
 def prepare_radar_data(selected_data):
