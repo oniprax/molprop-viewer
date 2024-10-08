@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import rdDepictor
@@ -35,7 +36,7 @@ property_descriptions = {
     "potency": "Amount of drug required to produce a specific effect"
 }
 
-def mol_to_svg(smiles, size=200):
+def mol_to_svg(smiles, size=150):  # Change size as needed
     mol = Chem.MolFromSmiles(smiles)
     if mol is not None:
         rdDepictor.Compute2DCoords(mol)
@@ -59,7 +60,7 @@ def molecule_selection_page():
                     selected = st.checkbox("", key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
                     svg = mol_to_svg(molecule['smiles'])
                     if svg != "Invalid SMILES":
-                        st.components.v1.html(svg, height=200, width=200)
+                        st.components.v1.html(svg, height=150, width=150) # change size as needed
                     else:
                         st.warning(f"Could not render molecule: {molecule['name']}")
                     st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 18px;'>{molecule['name']}</p>", unsafe_allow_html=True)
@@ -88,7 +89,7 @@ def property_view_page():
         with cols[i]:
             svg = mol_to_svg(mol['smiles'])
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=200, width=200)
+                st.components.v1.html(svg, height=150, width=150) # change size as needed
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
             st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 18px;'>{mol['name']}</p>", unsafe_allow_html=True)
@@ -124,14 +125,20 @@ def display_radar_plot(selected_data):
     df = df.round(2)  # Round to 2 decimal places
     df.index = [m["name"] for m in selected_data]
     
+    # Define a color palette with distinct colors
+    color_palette = px.colors.qualitative.Bold
+
     fig = go.Figure()
 
-    for molecule in df.index:
+    for i, molecule in enumerate(df.index):
         fig.add_trace(go.Scatterpolar(
             r=df.loc[molecule].values.tolist() + [df.loc[molecule].values[0]],
             theta=df.columns.tolist() + [df.columns[0]],
             fill='toself',
-            name=molecule
+            name=molecule,
+            line_color=color_palette[i % len(color_palette)],
+            fillcolor=color_palette[i % len(color_palette)],
+            opacity=0.6
         ))
 
     fig.update_layout(
