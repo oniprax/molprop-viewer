@@ -3,6 +3,7 @@ import pandas as pd
 import altair as alt
 from rdkit import Chem
 from rdkit.Chem import Draw
+import plotly.graph_objects as go
 import io
 import base64
 import math
@@ -146,55 +147,31 @@ def display_radar_plot(selected_data):
     df = pd.DataFrame([m["properties"] for m in selected_data])
     df.index = [m["name"] for m in selected_data]
     
-    # Melt the dataframe
-    df_melted = df.reset_index().melt(id_vars='index', var_name='property', value_name='value')
-    df_melted = df_melted.rename(columns={'index': 'molecule'})
-
-    # Calculate angles for each property
     properties = list(df.columns)
-    n_properties = len(properties)
-    angles = [i / n_properties * 2 * math.pi for i in range(n_properties)]
-    angles += angles[:1]  # Repeat the first angle to close the polygon
+    
+    fig = go.Figure()
 
-    # Create the base chart
-    base = alt.Chart(df_melted).encode(
-        theta=alt.Theta('property:N', sort=None, stack=None),
-        radius=alt.Radius('value:Q', scale=alt.Scale(type='sqrt', zero=True, rangeMin=20)),
-        color='molecule:N'
+    for molecule in df.index:
+        fig.add_trace(go.Scatterpolar(
+            r=df.loc[molecule].values.tolist() + [df.loc[molecule].values[0]],
+            theta=properties + [properties[0]],
+            fill='toself',
+            name=molecule
+        ))
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 5]
+            )),
+        showlegend=True,
+        title="Molecular Properties Comparison",
+        height=600,
+        width=800
     )
 
-    # Create the radar chart
-    lines = base.mark_line(point=True).encode(
-        order='property'
-    )
-
-    # Add circular grid lines
-    grid_data = pd.DataFrame({'radius': [1, 2, 3, 4, 5]})
-    grid = alt.Chart(grid_data).encode(
-        theta=alt.Theta(datum=2 * math.pi, scale=alt.Scale(domain=[0, 2 * math.pi])),
-        radius=alt.Radius('radius:Q', scale=alt.Scale(domain=[0, 5]))
-    ).mark_circle(
-        color='lightgray',
-        strokeWidth=1,
-        opacity=0.5,
-        fill=None
-    )
-
-    # Add property labels
-    labels = alt.Chart(pd.DataFrame({
-        'property': properties,
-        'angle': angles[:-1],
-        'radius': [5.5] * n_properties
-    })).encode(
-        text='property:N',
-        theta='angle:Q',
-        radius='radius:Q'
-    ).mark_text(align='center', baseline='middle')
-
-    # Combine all elements
-    radar = (grid + lines + labels).properties(width=500, height=500)
-
-    st.altair_chart(radar, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True)
 
 if __name__ == "__main__":
     main()
