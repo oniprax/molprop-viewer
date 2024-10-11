@@ -7,8 +7,12 @@ from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import rdDepictor
 
-st.set_page_config(page_title="Molecular Property Viewer", layout="wide")
+st.set_page_config(page_title="Molecular Property Predictor", layout="wide")
 
+def local_css(file_name):
+    with open(file_name, 'r') as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+        
 @st.cache_data
 def load_molecules():
     # This function will now cache the molecules data
@@ -392,7 +396,8 @@ def get_traffic_light_color(property_name, value):
         return "green"
 
 def main():
-    st.title("Molecular Property Viewer")
+    st.title("Molecular Property Predictor")
+    local_css("style.css")  
 
     # Use session state to store selected molecules
     if 'selected_molecules' not in st.session_state:
