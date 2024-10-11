@@ -352,11 +352,11 @@ def display_property_descriptions():
 
 def get_traffic_light_color(property_name, value):
     thresholds = {
-        "lipophilicity": {"low": 2, "high": 4},
-        "solubility": {"low": 1, "high": 2},
-        "permeability": {"low": 1, "high": 2},
-        "clearance": {"low": 1, "high": 2},
-        "potency": {"low": 1, "high": 2}
+        "potency": {"low": 6, "high": 7},
+        "lipophilicity": {"low": 3, "high": 4},
+        "solubility": {"low": 30, "high": 60},
+        "permeability": {"low": 8, "high": 12},
+        "synthesisability": {"low": 0.65, "high": 0.7}
     }
     
     low, high = thresholds[property_name]["low"], thresholds[property_name]["high"]
