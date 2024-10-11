@@ -315,7 +315,7 @@ def display_radar_plot(selected_data):
 
     fig = go.Figure()
 
-    for molecule in df_scaled.index:
+    for i,molecule in enumerate(df_scaled.index):
         color = color_palette[i % len(color_palette)]
         fig.add_trace(go.Scatterpolar(
             r=df_scaled.loc[molecule].values.tolist() + [df_scaled.loc[molecule].values[0]],
