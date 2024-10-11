@@ -351,16 +351,16 @@ def display_radar_plot(selected_data):
     )
 
     # Add property names as annotations
-    for i, prop in enumerate(df.columns):
-        angle = i * 360 / len(df.columns)
-        fig.add_annotation(
-            # text=f"{prop}<br>Max: {max_values[prop]:.2f}",
-            text=f"{prop}",
-            x=1.2 * np.cos(np.radians(angle)),
-            y=1.2 * np.sin(np.radians(angle)),
-            showarrow=False,
-            font=dict(size=12)
-        )
+    # for i, prop in enumerate(df.columns):
+    #     angle = i * 360 / len(df.columns)
+    #     fig.add_annotation(
+    #         # text=f"{prop}<br>Max: {max_values[prop]:.2f}",
+    #         text=f"{prop}",
+    #         x=1.2 * np.cos(np.radians(angle)),
+    #         y=1.2 * np.sin(np.radians(angle)),
+    #         showarrow=False,
+    #         font=dict(size=12)
+    #     )
 
     st.plotly_chart(fig, use_container_width=True)
 
