@@ -300,28 +300,25 @@ def prepare_radar_data(selected_data):
 def display_radar_plot(selected_data):
     df = prepare_radar_data(selected_data)
     
-    # Define a color palette with distinct colors
-    color_palette = px.colors.qualitative.Bold
-
+    # Calculate the max value for each property
+    max_values = df.max()
+    
     fig = go.Figure()
 
-    for i, molecule in enumerate(df.index):
-        color = color_palette[i % len(color_palette)]
+    for molecule in df.index:
         fig.add_trace(go.Scatterpolar(
             r=df.loc[molecule].values.tolist() + [df.loc[molecule].values[0]],
             theta=df.columns.tolist() + [df.columns[0]],
             fill='toself',
-            name=molecule,
-            line_color=color,
-            fillcolor=color,
-            opacity=0.5  # Adjust this value to change transparency (0.0 to 1.0)
+            name=molecule
         ))
 
+    # Update layout with dynamic ranges
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[0, 5],
+                range=[0, max(max_values) * 1.1],  # Add 10% padding
                 tickfont=dict(size=14)
             ),
             angularaxis=dict(
@@ -337,6 +334,15 @@ def display_radar_plot(selected_data):
         height=600,
         width=800
     )
+
+    # Add dynamic range for each property
+    for i, prop in enumerate(df.columns):
+        fig.update_layout({
+            f'polar.radialaxis.angle{i}': dict(
+                range=[0, max_values[prop] * 1.1],
+                title=dict(text=prop, font=dict(size=12))
+            )
+        })
 
     st.plotly_chart(fig, use_container_width=True)
 
