@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 from rdkit import Chem
@@ -297,45 +298,43 @@ def prepare_radar_data(selected_data):
     df.index = [m["name"] for m in selected_data]
     return df
     
+import numpy as np
+
 def display_radar_plot(selected_data):
     df = prepare_radar_data(selected_data)
     
     # Calculate the max value for each property
     max_values = df.max()
-    
+    overall_max = max(max_values) * 1.1  # Add 10% padding
+
+    # Scale the data to fit within 0-1 range
+    df_scaled = df / max_values
+
     fig = go.Figure()
 
-    for molecule in df.index:
+    for molecule in df_scaled.index:
         fig.add_trace(go.Scatterpolar(
-            r=df.loc[molecule].values.tolist() + [df.loc[molecule].values[0]],
-            theta=df.columns.tolist() + [df.columns[0]],
+            r=df_scaled.loc[molecule].values.tolist() + [df_scaled.loc[molecule].values[0]],
+            theta=df_scaled.columns.tolist() + [df_scaled.columns[0]],
             fill='toself',
             name=molecule
         ))
 
-    # Create a list of dictionaries for radial axes
-    radial_axes = []
-    for i, prop in enumerate(df.columns):
-        radial_axes.append(dict(
-            range=[0, max_values[prop] * 1.1],
-            angle=i * 360 / len(df.columns),
-            tickangle=i * 360 / len(df.columns),
-            title=dict(text=prop, font=dict(size=12))
-        ))
-
-    # Update layout with dynamic ranges
+    # Update layout
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                tickfont=dict(size=14)
+                range=[0, 1],  # Now all data is scaled to 0-1
+                tickfont=dict(size=14),
+                tickmode='array',
+                tickvals=np.linspace(0, 1, 6),
+                ticktext=[f'{v:.1f}' for v in np.linspace(0, overall_max, 6)]
             ),
             angularaxis=dict(
                 tickfont=dict(size=14)
-            ),
-            radialaxis_angle=0
+            )
         ),
-        polar_radialaxis=radial_axes,
         showlegend=True,
         legend=dict(font=dict(size=16)),
         title=dict(
@@ -345,6 +344,17 @@ def display_radar_plot(selected_data):
         height=600,
         width=800
     )
+
+    # Add property names as annotations
+    for i, prop in enumerate(df.columns):
+        angle = i * 360 / len(df.columns)
+        fig.add_annotation(
+            text=f"{prop}<br>Max: {max_values[prop]:.2f}",
+            x=1.2 * np.cos(np.radians(angle)),
+            y=1.2 * np.sin(np.radians(angle)),
+            showarrow=False,
+            font=dict(size=12)
+        )
 
     st.plotly_chart(fig, use_container_width=True)
 
