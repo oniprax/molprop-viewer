@@ -135,7 +135,7 @@ def mol_to_svg(smiles, size=150):
         rdDepictor.Compute2DCoords(mol)
         drawer = Draw.MolDraw2DSVG(size, size)
         drawer.drawOptions().addStereoAnnotation = True
-        drawer.drawOptions().additionalAtomLabelPadding = 0.3
+        drawer.drawOptions().additionalAtomLabelPadding = 0.1
         drawer.drawOptions().bondLineWidth = 2
         drawer.drawOptions().minFontSize = 8
         drawer.DrawMolecule(mol)
@@ -245,7 +245,7 @@ def property_view_page():
                 st.components.v1.html(svg, height=180, width=180)
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
-            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 12px; margin: 0;'>{mol['name']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 20px; margin: 0;'>{mol['name']}</p>", unsafe_allow_html=True)
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
 
@@ -297,8 +297,6 @@ def prepare_radar_data(selected_data):
     df = df.round(2)  # Round to 2 decimal places
     df.index = [m["name"] for m in selected_data]
     return df
-    
-import numpy as np
 
 def display_radar_plot(selected_data):
     df = prepare_radar_data(selected_data)
