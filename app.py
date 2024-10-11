@@ -324,7 +324,7 @@ def display_radar_plot(selected_data):
             name=molecule,
             line_color=color,
             fillcolor=color,
-            opacity=0.5
+            opacity=0.3
         ))
 
     # Update layout
