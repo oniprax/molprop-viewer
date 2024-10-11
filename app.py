@@ -128,13 +128,15 @@ def load_molecules():
 
 
 @st.cache_data
-def mol_to_svg(smiles, size=150):
+def mol_to_svg(smiles, size=180):
     mol = Chem.MolFromSmiles(smiles)
     if mol is not None:
         rdDepictor.Compute2DCoords(mol)
         drawer = Draw.MolDraw2DSVG(size, size)
         drawer.drawOptions().addStereoAnnotation = True
         drawer.drawOptions().additionalAtomLabelPadding = 0.3
+        drawer.drawOptions().bondLineWidth = 2
+        drawer.drawOptions().minFontSize = 8
         drawer.DrawMolecule(mol)
         drawer.FinishDrawing()
         svg = drawer.GetDrawingText()
@@ -156,31 +158,36 @@ def molecule_selection_page():
     st.subheader("Select Molecules (up to 4)")
     molecules = load_molecules()
 
-    # Custom CSS to reduce padding
+    # Custom CSS to reduce space between boxes and increase size
     st.markdown("""
         <style>
         .stSelectbox, .stCheckbox {
-            padding-bottom: 0px;
+            padding: 0px !important;
+            margin: 0px !important;
         }
         .element-container {
-            margin-bottom: 10px;
+            margin: 0px !important;
+            padding: 0px !important;
+        }
+        .row-widget {
+            min-height: 0px !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # Use st.columns with custom widths
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    # Use a grid layout
+    col1, col2, col3, col4 = st.columns(4)
     columns = [col1, col2, col3, col4]
 
     for i, molecule in enumerate(molecules):
         with columns[i % 4]:
             selected = st.checkbox("", key=f"mol_{i}", value=molecule['name'] in st.session_state.selected_molecules)
-            svg = mol_to_svg(molecule['smiles'], size=150)  # Change size
+            svg = mol_to_svg(molecule['smiles'], size=180)  # Increased size
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=120, width=120)
+                st.components.v1.html(svg, height=180, width=180)
             else:
                 st.warning(f"Could not render molecule: {molecule['name']}")
-            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 14px; margin: 0;'>{molecule['name']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 12px; margin: 0;'>{molecule['name']}</p>", unsafe_allow_html=True)
         
         if selected and molecule['name'] not in st.session_state.selected_molecules:
             if len(st.session_state.selected_molecules) < 4:
@@ -200,11 +207,12 @@ def property_view_page():
     molecules = load_molecules()
     selected_data = [m for m in molecules if m['name'] in st.session_state.selected_molecules]
 
-    # Custom CSS to reduce padding
+    # Custom CSS to reduce space between boxes and increase size
     st.markdown("""
         <style>
         .element-container {
-            margin-bottom: 10px;
+            margin: 0px !important;
+            padding: 0px !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -214,12 +222,12 @@ def property_view_page():
     cols = st.columns(4)
     for i, mol in enumerate(selected_data):
         with cols[i]:
-            svg = mol_to_svg(mol['smiles'], size=150)  # Change size
+            svg = mol_to_svg(mol['smiles'], size=180)  # Increased size
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=120, width=120)
+                st.components.v1.html(svg, height=180, width=180)
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
-            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 14px; margin: 0;'>{mol['name']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 12px; margin: 0;'>{mol['name']}</p>", unsafe_allow_html=True)
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
 
