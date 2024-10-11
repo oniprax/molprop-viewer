@@ -17,118 +17,118 @@ def load_molecules():
                  'lipophilicity': 3.59,
                  'solubility': 39.0,
                  'permeability': 8.31,
-                 'synthetic accessibility': 0.72}},
+                 'synthesisability': 0.72}},
  {'name': 'ID02',
   'smiles': 'CN1C(=O)C=C(c2cnn(c2)C)c2cc(ccc21)Nc1ccncc1Cl',
   'properties': {'potency': 4.91,
                  'lipophilicity': 3.73,
                  'solubility': 0.0,
                  'permeability': 10.51,
-                 'synthetic accessibility': 0.74}},
+                 'synthesisability': 0.74}},
  {'name': 'ID03',
   'smiles': 'Clc1nccc(c1C#N)Nc1ccc2c(c1)C(=CC(=O)N2)c1cnn(c1)CCN1CCOCC1',
   'properties': {'potency': 5.43,
                  'lipophilicity': 3.39,
                  'solubility': 52.0,
                  'permeability': 6.85,
-                 'synthetic accessibility': 0.71}},
- # {'name': 'ID04',
+                 'synthesisability': 0.71}},
+ # {'name': 'ID',
  #  'smiles': 'CN1CCN(CC1)C1=CC(=O)Nc2ccc(cc21)Nc1ccnc(c1C#N)Cl',
  #  'properties': {'potency': 5.44,
  #                 'lipophilicity': 2.94,
  #                 'solubility': 40.0,
  #                 'permeability': 5.52,
- #                 'synthetic accessibility': 0.73}},
- {'name': 'ID05',
+ #                 'synthesisability': 0.73}},
+ {'name': 'ID04',
   'smiles': 'Cn1cc(cn1)C1=CC(=O)N(CC2CCOCC2)c2ccc(cc21)Nc1ccnc(c1C#N)Cl',
   'properties': {'potency': 5.73,
                  'lipophilicity': 4.49,
                  'solubility': 86.0,
                  'permeability': 15.7,
-                 'synthetic accessibility': 0.7}},
- {'name': 'ID06',
+                 'synthesisability': 0.7}},
+ {'name': 'ID05',
   'smiles': 'CNC(=O)Cn1cc(cn1)C1=CC(=O)Nc2ccc(cc21)Nc1ccnc(c1C#N)Cl',
   'properties': {'potency': 5.82,
                  'lipophilicity': 2.8,
                  'solubility': 34.0,
                  'permeability': 4.25,
-                 'synthetic accessibility': 0.71}},
- {'name': 'ID07',
+                 'synthesisability': 0.71}},
+ {'name': 'ID06',
   'smiles': 'CNC(=O)[C@@H](C)NC1=CC(=O)Nc2ccc(cc21)Nc1ccnc(c1C#N)Cl',
   'properties': {'potency': 6.6,
                  'lipophilicity': 2.74,
                  'solubility': 64.0,
                  'permeability': 4.16,
-                 'synthetic accessibility': 0.67}},
- {'name': 'ID08',
+                 'synthesisability': 0.67}},
+ {'name': 'ID07',
   'smiles': 'CNC(=O)[C@H](C)NC1=CC(=O)Nc2ccc(cc21)Nc1ccnc(c1C#N)Cl',
   'properties': {'potency': 5.57,
                  'lipophilicity': 2.74,
                  'solubility': 64.0,
                  'permeability': 4.16,
-                 'synthetic accessibility': 0.67}},
- # {'name': 'ID09',
+                 'synthesisability': 0.67}},
+ # {'name': 'ID',
  #  'smiles': 'CCNC1=CC(=O)N(C)c2ccc(cc21)Nc1cc(nc(c1C#N)Cl)C(=O)O',
  #  'properties': {'potency': 6.05,
  #                 'lipophilicity': 3.33,
  #                 'solubility': 237.0,
  #                 'permeability': 6.37,
- #                 'synthetic accessibility': 0.72}},
- {'name': 'ID10',
+ #                 'synthesisability': 0.72}},
+ {'name': 'ID08',
   'smiles': 'C[C@@H](NC1=CC(=O)N(C)c2ccc(cc21)Nc1ccnc(c1C#N)Cl)C(=O)NC1CCCC1',
   'properties': {'potency': 6.59,
                  'lipophilicity': 4.06,
                  'solubility': 58.0,
                  'permeability': 10.97,
-                 'synthetic accessibility': 0.67}},
- {'name': 'ID11',
+                 'synthesisability': 0.67}},
+ {'name': 'ID09',
   'smiles': 'C[C@H]1COC(=O)C2=C(N1)c1cc(ccc1N(C)C2=O)Nc1ccnc(c1C#N)Cl',
   'properties': {'potency': 7.03,
                  'lipophilicity': 3.17,
                  'solubility': 0.0,
                  'permeability': 5.96,
-                 'synthetic accessibility': 0.64}},
- # {'name': 'ID12',
+                 'synthesisability': 0.64}},
+ # {'name': 'ID',
  #  'smiles': 'CN1C(=O)C=C(NC(C)(C)c2ncccn2)c2cc(ccc21)Nc1ccnc(c1C#N)Cl',
  #  'properties': {'potency': 6.33,
  #                 'lipophilicity': 4.34,
  #                 'solubility': 15.0,
  #                 'permeability': 13.51,
- #                 'synthetic accessibility': 0.69}},
- {'name': 'ID13',
+ #                 'synthesisability': 0.69}},
+ {'name': 'ID10',
   'smiles': 'CN1C(=O)C2=C(N[C@@H](C3CC3)C(F)(F)CO2)c2cc(ccc21)Nc1nc(ncc1Cl)-n1nc(cc1C)C',
   'properties': {'potency': 7.95,
                  'lipophilicity': 4.75,
                  'solubility': 21.07,
                  'permeability': 18.67,
-                 'synthetic accessibility': 0.61}},
- {'name': 'ID14',
+                 'synthesisability': 0.61}},
+ {'name': 'ID11',
   'smiles': 'CN1C(=O)C2=C(N[C@@H](C3CC3)C(F)(F)CO2)c2cc(ccc21)Nc1nc(ncc1Cl)N1CC(F)C1',
   'properties': {'potency': 8.21,
                  'lipophilicity': 4.1,
                  'solubility': 17.0,
                  'permeability': 12.6,
-                 'synthetic accessibility': 0.6}},
- # {'name': 'ID15',
+                 'synthesisability': 0.6}},
+ # {'name': 'ID',
  #  'smiles': 'CN1C(=O)C2=C(N[C@@H](C3CC3)C(F)(F)CO2)c2cc(ccc21)Nc1nc(ncc1Cl)N1C2CCC1CN(C2)C(=O)C',
  #  'properties': {'potency': 9.04,
  #                 'lipophilicity': 4.14,
  #                 'solubility': 34.81,
  #                 'permeability': 11.96,
- #                 'synthetic accessibility': 0.48}},
- {'name': 'ID16',
+ #                 'synthesisability': 0.48}},
+ {'name': 'ID12',
   'smiles': 'C[C@@H]1C[C@H](O)CN(C1)c1ncc(c(n1)Nc1ccc2c(c1)C1=C(OCC(F)(F)[C@@H](N1)C1CC1)C(=O)N2C)Cl',
   'properties': {'potency': 8.56,
                  'lipophilicity': 4.15,
                  'solubility': 7.69,
                  'permeability': 12.03,
-                 'synthetic accessibility': 0.55}
+                 'synthesisability': 0.55}
  }
            ]
 
 
 @st.cache_data
-def mol_to_svg(smiles, size=180):
+def mol_to_svg(smiles, size=150):
     mol = Chem.MolFromSmiles(smiles)
     if mol is not None:
         rdDepictor.Compute2DCoords(mol)
@@ -144,14 +144,31 @@ def mol_to_svg(smiles, size=180):
     else:
         return "Invalid SMILES"
 
+def get_traffic_light_color(property_name, value):
+    thresholds = {
+        "potency": {"low": 6, "high": 7},
+        "lipophilicity": {"low": 3, "high": 4},
+        "solubility": {"low": 30, "high": 60},
+        "permeability": {"low": 8, "high": 12},
+        "synthesisability": {"low": 0.65, "high": 0.7}
+    }
+    
+    low, high = thresholds[property_name]["low"], thresholds[property_name]["high"]
+    if value <= low:
+        return "red"
+    elif value <= high:
+        return "yellow"
+    else:
+        return "green"
+        
 @st.cache_data
 def get_property_descriptions():
     return {
-        "lipophilicity": "Measure of a drug's ability to dissolve in fats, oils, and non-polar solvents",
-        "solubility": "Ability of a drug to dissolve in water",
-        "permeability": "Ease with which a drug can pass through cell membranes",
-        "clearance": "Rate at which a drug is removed from the body",
-        "potency": "Amount of drug required to produce a specific effect"
+        "potency": "Amount of molecule required to produce a specific effect",
+        "lipophilicity": "Measure of a molecule's ability to dissolve in fats, oils, and non-polar solvents",
+        "solubility": "Ability of a molecule to dissolve in water",
+        "permeability": "Ease with which a molecule can pass through cell membranes",
+        "synthesisability": "Ease with which a molecule can be synthesised in the lab"
     }
 
 def molecule_selection_page():
@@ -182,7 +199,7 @@ def molecule_selection_page():
     for i, molecule in enumerate(molecules):
         with columns[i % 4]:
             selected = st.checkbox("", key=f"mol_{i}", value=molecule['name'] in st.session_state.selected_molecules)
-            svg = mol_to_svg(molecule['smiles'], size=180)  # Increased size
+            svg = mol_to_svg(molecule['smiles'], size=150)  # Increased size
             if svg != "Invalid SMILES":
                 st.components.v1.html(svg, height=180, width=180)
             else:
@@ -222,7 +239,7 @@ def property_view_page():
     cols = st.columns(4)
     for i, mol in enumerate(selected_data):
         with cols[i]:
-            svg = mol_to_svg(mol['smiles'], size=180)  # Increased size
+            svg = mol_to_svg(mol['smiles'], size=150)  # Increased size
             if svg != "Invalid SMILES":
                 st.components.v1.html(svg, height=180, width=180)
             else:
