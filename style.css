@@ -1,0 +1,29 @@
+/* Change the background color and text color of all buttons */
+.stButton > button {
+    background-color: #4CAF50;  /* Green background */
+    color: white;  /* White text */
+    border: none;
+    padding: 10px 24px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition-duration: 0.4s;
+}
+
+/* Change button color on hover */
+.stButton > button:hover {
+    background-color: #45a049;  /* Darker green */
+}
+
+/* Style for the "Back to Selection" button */
+.stButton > button[kind="secondary"] {
+    background-color: #f44336;  /* Red background */
+}
+
+.stButton > button[kind="secondary"]:hover {
+    background-color: #da190b;  /* Darker red */
+}
