@@ -313,18 +313,29 @@ def display_radar_plot(selected_data):
             name=molecule
         ))
 
+    # Create a list of dictionaries for radial axes
+    radial_axes = []
+    for i, prop in enumerate(df.columns):
+        radial_axes.append(dict(
+            range=[0, max_values[prop] * 1.1],
+            angle=i * 360 / len(df.columns),
+            tickangle=i * 360 / len(df.columns),
+            title=dict(text=prop, font=dict(size=12))
+        ))
+
     # Update layout with dynamic ranges
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[0, max(max_values) * 1.1],  # Add 10% padding
                 tickfont=dict(size=14)
             ),
             angularaxis=dict(
                 tickfont=dict(size=14)
-            )
+            ),
+            radialaxis_angle=0
         ),
+        polar_radialaxis=radial_axes,
         showlegend=True,
         legend=dict(font=dict(size=16)),
         title=dict(
@@ -334,15 +345,6 @@ def display_radar_plot(selected_data):
         height=600,
         width=800
     )
-
-    # Add dynamic range for each property
-    for i, prop in enumerate(df.columns):
-        fig.update_layout({
-            f'polar.radialaxis.angle{i}': dict(
-                range=[0, max_values[prop] * 1.1],
-                title=dict(text=prop, font=dict(size=12))
-            )
-        })
 
     st.plotly_chart(fig, use_container_width=True)
 
