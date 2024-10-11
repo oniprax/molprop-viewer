@@ -205,7 +205,7 @@ def molecule_selection_page():
                 st.components.v1.html(svg, height=180, width=180)
             else:
                 st.warning(f"Could not render molecule: {molecule['name']}")
-            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 20px; margin: 0.5;'>{molecule['name']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 20px; margin: 5;'>{molecule['name']}</p>", unsafe_allow_html=True)
         
         if selected and molecule['name'] not in st.session_state.selected_molecules:
             if len(st.session_state.selected_molecules) < 4:
