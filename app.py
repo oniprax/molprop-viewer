@@ -32,13 +32,13 @@ def load_molecules():
                  'solubility': 52.0,
                  'permeability': 6.85,
                  'synthetic accessibility': 0.71}},
- {'name': 'ID04',
-  'smiles': 'CN1CCN(CC1)C1=CC(=O)Nc2ccc(cc21)Nc1ccnc(c1C#N)Cl',
-  'properties': {'potency': 5.44,
-                 'lipophilicity': 2.94,
-                 'solubility': 40.0,
-                 'permeability': 5.52,
-                 'synthetic accessibility': 0.73}},
+ # {'name': 'ID04',
+ #  'smiles': 'CN1CCN(CC1)C1=CC(=O)Nc2ccc(cc21)Nc1ccnc(c1C#N)Cl',
+ #  'properties': {'potency': 5.44,
+ #                 'lipophilicity': 2.94,
+ #                 'solubility': 40.0,
+ #                 'permeability': 5.52,
+ #                 'synthetic accessibility': 0.73}},
  {'name': 'ID05',
   'smiles': 'Cn1cc(cn1)C1=CC(=O)N(CC2CCOCC2)c2ccc(cc21)Nc1ccnc(c1C#N)Cl',
   'properties': {'potency': 5.73,
@@ -67,13 +67,13 @@ def load_molecules():
                  'solubility': 64.0,
                  'permeability': 4.16,
                  'synthetic accessibility': 0.67}},
- {'name': 'ID09',
-  'smiles': 'CCNC1=CC(=O)N(C)c2ccc(cc21)Nc1cc(nc(c1C#N)Cl)C(=O)O',
-  'properties': {'potency': 6.05,
-                 'lipophilicity': 3.33,
-                 'solubility': 237.0,
-                 'permeability': 6.37,
-                 'synthetic accessibility': 0.72}},
+ # {'name': 'ID09',
+ #  'smiles': 'CCNC1=CC(=O)N(C)c2ccc(cc21)Nc1cc(nc(c1C#N)Cl)C(=O)O',
+ #  'properties': {'potency': 6.05,
+ #                 'lipophilicity': 3.33,
+ #                 'solubility': 237.0,
+ #                 'permeability': 6.37,
+ #                 'synthetic accessibility': 0.72}},
  {'name': 'ID10',
   'smiles': 'C[C@@H](NC1=CC(=O)N(C)c2ccc(cc21)Nc1ccnc(c1C#N)Cl)C(=O)NC1CCCC1',
   'properties': {'potency': 6.59,
@@ -88,13 +88,13 @@ def load_molecules():
                  'solubility': 0.0,
                  'permeability': 5.96,
                  'synthetic accessibility': 0.64}},
- {'name': 'ID12',
-  'smiles': 'CN1C(=O)C=C(NC(C)(C)c2ncccn2)c2cc(ccc21)Nc1ccnc(c1C#N)Cl',
-  'properties': {'potency': 6.33,
-                 'lipophilicity': 4.34,
-                 'solubility': 15.0,
-                 'permeability': 13.51,
-                 'synthetic accessibility': 0.69}},
+ # {'name': 'ID12',
+ #  'smiles': 'CN1C(=O)C=C(NC(C)(C)c2ncccn2)c2cc(ccc21)Nc1ccnc(c1C#N)Cl',
+ #  'properties': {'potency': 6.33,
+ #                 'lipophilicity': 4.34,
+ #                 'solubility': 15.0,
+ #                 'permeability': 13.51,
+ #                 'synthetic accessibility': 0.69}},
  {'name': 'ID13',
   'smiles': 'CN1C(=O)C2=C(N[C@@H](C3CC3)C(F)(F)CO2)c2cc(ccc21)Nc1nc(ncc1Cl)-n1nc(cc1C)C',
   'properties': {'potency': 7.95,
@@ -109,13 +109,13 @@ def load_molecules():
                  'solubility': 17.0,
                  'permeability': 12.6,
                  'synthetic accessibility': 0.6}},
- {'name': 'ID15',
-  'smiles': 'CN1C(=O)C2=C(N[C@@H](C3CC3)C(F)(F)CO2)c2cc(ccc21)Nc1nc(ncc1Cl)N1C2CCC1CN(C2)C(=O)C',
-  'properties': {'potency': 9.04,
-                 'lipophilicity': 4.14,
-                 'solubility': 34.81,
-                 'permeability': 11.96,
-                 'synthetic accessibility': 0.48}},
+ # {'name': 'ID15',
+ #  'smiles': 'CN1C(=O)C2=C(N[C@@H](C3CC3)C(F)(F)CO2)c2cc(ccc21)Nc1nc(ncc1Cl)N1C2CCC1CN(C2)C(=O)C',
+ #  'properties': {'potency': 9.04,
+ #                 'lipophilicity': 4.14,
+ #                 'solubility': 34.81,
+ #                 'permeability': 11.96,
+ #                 'synthetic accessibility': 0.48}},
  {'name': 'ID16',
   'smiles': 'C[C@@H]1C[C@H](O)CN(C1)c1ncc(c(n1)Nc1ccc2c(c1)C1=C(OCC(F)(F)[C@@H](N1)C1CC1)C(=O)N2C)Cl',
   'properties': {'potency': 8.56,
@@ -133,6 +133,8 @@ def mol_to_svg(smiles, size=150):
     if mol is not None:
         rdDepictor.Compute2DCoords(mol)
         drawer = Draw.MolDraw2DSVG(size, size)
+        drawer.drawOptions().addStereoAnnotation = True
+        drawer.drawOptions().additionalAtomLabelPadding = 0.3
         drawer.DrawMolecule(mol)
         drawer.FinishDrawing()
         svg = drawer.GetDrawingText()
@@ -154,25 +156,37 @@ def molecule_selection_page():
     st.subheader("Select Molecules (up to 4)")
     molecules = load_molecules()
 
-    for i in range(0, len(molecules), 4):
-        cols = st.columns(4)
-        for j, col in enumerate(cols):
-            if i + j < len(molecules):
-                molecule = molecules[i + j]
-                with col:
-                    selected = st.checkbox("", key=f"mol_{i+j}", value=molecule['name'] in st.session_state.selected_molecules)
-                    svg = mol_to_svg(molecule['smiles'])
-                    if svg != "Invalid SMILES":
-                        st.components.v1.html(svg, height=150, width=150)
-                    else:
-                        st.warning(f"Could not render molecule: {molecule['name']}")
-                    st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 18px;'>{molecule['name']}</p>", unsafe_allow_html=True)
-                
-                if selected and molecule['name'] not in st.session_state.selected_molecules:
-                    if len(st.session_state.selected_molecules) < 4:
-                        st.session_state.selected_molecules.append(molecule['name'])
-                elif not selected and molecule['name'] in st.session_state.selected_molecules:
-                    st.session_state.selected_molecules.remove(molecule['name'])
+    # Custom CSS to reduce padding
+    st.markdown("""
+        <style>
+        .stSelectbox, .stCheckbox {
+            padding-bottom: 0px;
+        }
+        .element-container {
+            margin-bottom: 10px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Use st.columns with custom widths
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    columns = [col1, col2, col3, col4]
+
+    for i, molecule in enumerate(molecules):
+        with columns[i % 4]:
+            selected = st.checkbox("", key=f"mol_{i}", value=molecule['name'] in st.session_state.selected_molecules)
+            svg = mol_to_svg(molecule['smiles'], size=150)  # Change size
+            if svg != "Invalid SMILES":
+                st.components.v1.html(svg, height=120, width=120)
+            else:
+                st.warning(f"Could not render molecule: {molecule['name']}")
+            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 14px; margin: 0;'>{molecule['name']}</p>", unsafe_allow_html=True)
+        
+        if selected and molecule['name'] not in st.session_state.selected_molecules:
+            if len(st.session_state.selected_molecules) < 4:
+                st.session_state.selected_molecules.append(molecule['name'])
+        elif not selected and molecule['name'] in st.session_state.selected_molecules:
+            st.session_state.selected_molecules.remove(molecule['name'])
 
     if st.button("View Properties", key='view_properties') and st.session_state.selected_molecules:
         st.session_state.page = 'property_view'
@@ -186,17 +200,26 @@ def property_view_page():
     molecules = load_molecules()
     selected_data = [m for m in molecules if m['name'] in st.session_state.selected_molecules]
 
+    # Custom CSS to reduce padding
+    st.markdown("""
+        <style>
+        .element-container {
+            margin-bottom: 10px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     # Display selected molecules
     st.subheader("Selected Molecules")
     cols = st.columns(4)
     for i, mol in enumerate(selected_data):
         with cols[i]:
-            svg = mol_to_svg(mol['smiles'])
+            svg = mol_to_svg(mol['smiles'], size=150)  # Change size
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=150, width=150)
+                st.components.v1.html(svg, height=120, width=120)
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
-            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 18px;'>{mol['name']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 14px; margin: 0;'>{mol['name']}</p>", unsafe_allow_html=True)
 
     view_type = st.radio("Select view type", ["Traffic Light", "Radar Plot"])
 
