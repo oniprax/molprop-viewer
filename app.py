@@ -303,6 +303,9 @@ import numpy as np
 def display_radar_plot(selected_data):
     df = prepare_radar_data(selected_data)
     
+    # Define a color palette with distinct colors
+    color_palette = px.colors.qualitative.Bold
+    
     # Calculate the max value for each property
     max_values = df.max()
     overall_max = max(max_values) * 1.1  # Add 10% padding
@@ -313,11 +316,15 @@ def display_radar_plot(selected_data):
     fig = go.Figure()
 
     for molecule in df_scaled.index:
+        color = color_palette[i % len(color_palette)]
         fig.add_trace(go.Scatterpolar(
             r=df_scaled.loc[molecule].values.tolist() + [df_scaled.loc[molecule].values[0]],
             theta=df_scaled.columns.tolist() + [df_scaled.columns[0]],
             fill='toself',
-            name=molecule
+            name=molecule,
+            line_color=color,
+            fillcolor=color,
+            opacity=0.5
         ))
 
     # Update layout
