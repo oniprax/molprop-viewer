@@ -20,11 +20,12 @@ def display_large_molecule(smiles):
     img = Draw.MolToImage(mol, size=(400, 400))
     st.image(img, use_column_width=True)
     
+@st.cache_data
 def load_molecule_dataframe():
     df = pd.read_pickle("./ccdd_smidf.pkl")
     # Convert SMILES to RDKit molecule objects
     for i,row in df.iterrows():
-        row['Molecule'] = Chem.MolFromSmiles(row['Mol'])
+        row['Mol'] = Chem.MolFromSmiles(row['Mol'])
         row['R1'] = Chem.MolFromSmiles(row['R1'])
         row['R2'] = Chem.MolFromSmiles(row['R2'])
         row['R3'] = Chem.MolFromSmiles(row['R3'])
@@ -50,7 +51,7 @@ def display_molecule_table(df):
         return f'<img src="data:image/png;base64,{mol_to_img(mol)}" width="150">'
 
     # Apply the function to create a new column with HTML
-    df['Structure'] = df['Molecule'].apply(mol_to_html)
+    df['Structure'] = df['Mol'].apply(mol_to_html)
 
     # Reorder columns
     columns = ['Select', 'ID', 'Structure', 'R1', 'R2', 'R3', 'R4']
