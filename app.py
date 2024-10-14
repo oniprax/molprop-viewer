@@ -18,11 +18,11 @@ def local_css(file_name):
 def display_large_molecule(smiles):
     mol = Chem.MolFromSmiles(smiles)
     img = Draw.MolToImage(mol, size=(300, 300))
-    st.image(img, use_column_width=True)
+    st.image(img, use_column_width=False)
     
 @st.cache_data
 def load_molecule_dataframe():
-    df = pd.read_pickle("./ccdd_smidf.pkl")
+    df = pd.read_pickle("./ccdd_moldf.pkl")
     # Convert SMILES to RDKit molecule objects
     for i,row in df.iterrows():
         row['Mol'] = Chem.MolFromSmiles(row['Mol'])
