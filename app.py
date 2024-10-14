@@ -6,6 +6,8 @@ import plotly.express as px
 from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import rdDepictor
+import base64
+import io
 
 st.set_page_config(page_title="Molecular Property Predictor", layout="wide")
 
@@ -21,6 +23,45 @@ def display_large_molecule(smiles):
 @st.cache_data
 def load_molecule_dataframe():
     return pd.read_pickle("./ccdd_moldf.pkl")
+
+def mol_to_img(mol):
+    img = Draw.MolToImage(mol)
+    buffered = io.BytesIO()
+    img.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode()
+    
+def display_molecule_table(df):
+    # Create a column for checkboxes
+    df['Select'] = False
+
+    # Function to create HTML for molecule image
+    def mol_to_html(mol):
+        return f'<img src="data:image/png;base64,{mol_to_img(mol)}" width="100">'
+
+    # Apply the function to create a new column with HTML
+    df['Structure'] = df['Mol'].apply(mol_to_html)
+
+    # Reorder columns
+    columns = ['Select', 'ID', 'Structure', 'R1', 'R2', 'R3', 'R4']
+    df = df[columns]
+
+    # Display the dataframe
+    edited_df = st.data_editor(
+        df,
+        hide_index=True,
+        column_config={
+            "Select": st.column_config.CheckboxColumn(required=True),
+            "Structure": st.column_config.Column(width="medium"),
+            "Name": st.column_config.TextColumn(width="medium"),
+        },
+        disabled=df.columns.drop('Select'),
+        key="molecule_table"
+    )
+
+    # Get selected molecules
+    selected_molecules = edited_df[edited_df['Select']]['ID'].tolist()
+    
+    return selected_molecules    
     
 @st.cache_data
 def load_molecules():
@@ -196,15 +237,13 @@ def molecule_selection_page():
     df = load_molecule_dataframe()
     
     st.write("Select up to 4 molecules:")
-    selected_indices = st.multiselect(
-        "Choose molecules",
-        options=df.index.tolist(),
-        format_func=lambda x: df.loc[x, 'ID'],
-        max_selections=4
-    )
+    selected_molecules = display_molecule_table(df)
     
-    if st.button("Predict Properties", key='view_properties') and selected_indices:
-        st.session_state.selected_molecules = [df.loc[i, 'ID'] for i in selected_indices]
+    if len(selected_molecules) > 4:
+        st.warning("Please select no more than 4 molecules.")
+    
+    if st.button("View Properties", key='view_properties') and 0 < len(selected_molecules) <= 4:
+        st.session_state.selected_molecules = selected_molecules
         st.session_state.page = 'property_view'
         st.rerun()
 
