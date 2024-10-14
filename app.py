@@ -204,7 +204,7 @@ def molecule_selection_page():
     )
     
     if st.button("Predict Properties", key='view_properties') and selected_indices:
-        st.session_state.selected_molecules = [df.loc[i, 'Name'] for i in selected_indices]
+        st.session_state.selected_molecules = [df.loc[i, 'ID'] for i in selected_indices]
         st.session_state.page = 'property_view'
         st.rerun()
 
