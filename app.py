@@ -199,7 +199,7 @@ def molecule_selection_page():
     selected_indices = st.multiselect(
         "Choose molecules",
         options=df.index.tolist(),
-        format_func=lambda x: df.loc[x, 'Name'],  # Assuming 'Name' is a column in your DataFrame
+        format_func=lambda x: df.loc[x, 'ID'],
         max_selections=4
     )
     
