@@ -24,11 +24,12 @@ def display_large_molecule(smiles):
 def load_molecule_dataframe():
     df = pd.read_pickle("./ccdd_smidf.pkl")
     # Convert SMILES to RDKit molecule objects
-    df['Molecule'] = df['Mol'].apply(Chem.MolFromSmiles)
-    df['R1'] = df['R1'].apply(Chem.MolFromSmiles)
-    df['R2'] = df['R2'].apply(Chem.MolFromSmiles)
-    df['R3'] = df['R3'].apply(Chem.MolFromSmiles)
-    df['R4'] = df['R4'].apply(Chem.MolFromSmiles)
+    for i,row in df.iterrows():
+        row['Mol'] = Chem.MolFromSmiles(row['Mol'])
+        row['R1'] = Chem.MolFromSmiles(row['R1'])
+        row['R2'] = Chem.MolFromSmiles(row['R2'])
+        row['R3'] = Chem.MolFromSmiles(row['R3'])
+        row['R4'] = Chem.MolFromSmiles(row['R4'])
     return df
 
 
