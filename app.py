@@ -20,7 +20,6 @@ def display_large_molecule(smiles):
     img = Draw.MolToImage(mol, size=(400, 400))
     st.image(img, use_column_width=True)
     
-@st.cache_data
 def load_molecule_dataframe():
     df = pd.read_pickle("./ccdd_smidf.pkl")
     # Convert SMILES to RDKit molecule objects
@@ -31,7 +30,6 @@ def load_molecule_dataframe():
         row['R3'] = Chem.MolFromSmiles(row['R3'])
         row['R4'] = Chem.MolFromSmiles(row['R4'])
     return df
-
 
 def mol_to_img(mol):
     img = Draw.MolToImage(mol, size=(150, 150))
