@@ -22,7 +22,7 @@ def display_large_molecule(smiles):
     
 @st.cache_data
 def load_molecule_dataframe():
-    df = pd.read_pickle("./ccdd_moldf.pkl")
+    df = pd.read_pickle("./ccdd_smidf.pkl")
     # Convert SMILES to RDKit molecule objects
     df['Molecule'] = df['Mol'].apply(Chem.MolFromSmiles)
     df['R1'] = df['R1'].apply(Chem.MolFromSmiles)
