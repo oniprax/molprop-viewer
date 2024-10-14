@@ -30,6 +30,7 @@ def load_molecule_dataframe():
         row['R2'] = Chem.MolFromSmiles(row['R2'])
         row['R3'] = Chem.MolFromSmiles(row['R3'])
         row['R4'] = Chem.MolFromSmiles(row['R4'])
+    df.reset_index(inplace=True)
     return df
 
 def mol_to_img(mol):
@@ -54,8 +55,8 @@ def display_molecule_table(df):
     df['Structure'] = df['Mol'].apply(mol_to_html)
 
     # Reorder columns
-    # columns = ['Select', 'ID', 'Structure', 'R1', 'R2', 'R3', 'R4']
-    # df = df[columns]
+    columns = ['Select', 'ID', 'Structure', 'R1', 'R2', 'R3', 'R4']
+    df = df[columns]
 
     # Display the dataframe
     edited_df = st.data_editor(
@@ -63,8 +64,8 @@ def display_molecule_table(df):
         hide_index=True,
         column_config={
             "Select": st.column_config.CheckboxColumn(required=True),
-            "Structure": st.column_config.Column(width="medium"),
             "ID": st.column_config.TextColumn(width="small"),
+            "Structure": st.column_config.Column(width="medium"),
             "R1": st.column_config.TextColumn(width="medium"),
             "R2": st.column_config.TextColumn(width="medium"),
             "R3": st.column_config.TextColumn(width="medium"),
