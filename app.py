@@ -12,7 +12,16 @@ st.set_page_config(page_title="Molecular Property Predictor", layout="wide")
 def local_css(file_name):
     with open(file_name, 'r') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-        
+
+def display_large_molecule(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    img = Draw.MolToImage(mol, size=(800, 400))
+    st.image(img, use_column_width=True)
+    
+@st.cache_data
+def load_molecule_dataframe():
+    return pd.read_pickle("./ccdd_moldf.pkl")
+    
 @st.cache_data
 def load_molecules():
     # This function will now cache the molecules data
@@ -175,49 +184,27 @@ def get_property_descriptions():
         "permeability": "Ease with which a molecule can pass through cell membranes",
         "synthesisability": "Ease with which a molecule can be synthesised in the lab"
     }
-
+    
 def molecule_selection_page():
-    st.subheader("Select Molecules (up to 4)")
-    molecules = load_molecules()
-
-    # Custom CSS to reduce space between boxes and increase size
-    st.markdown("""
-        <style>
-        .stSelectbox, .stCheckbox {
-            padding: 0px !important;
-            margin: 0px !important;
-        }
-        .element-container {
-            margin: 0px !important;
-            padding: 0px !important;
-        }
-        .row-widget {
-            min-height: 0px !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # Use a grid layout
-    col1, col2, col3, col4 = st.columns(4)
-    columns = [col1, col2, col3, col4]
-
-    for i, molecule in enumerate(molecules):
-        with columns[i % 4]:
-            selected = st.checkbox("", key=f"mol_{i}", value=molecule['name'] in st.session_state.selected_molecules)
-            svg = mol_to_svg(molecule['smiles'], size=150)  # Increased size
-            if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=180, width=180)
-            else:
-                st.warning(f"Could not render molecule: {molecule['name']}")
-            st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 20px; margin: 5;'>{molecule['name']}</p>", unsafe_allow_html=True)
-        
-        if selected and molecule['name'] not in st.session_state.selected_molecules:
-            if len(st.session_state.selected_molecules) < 4:
-                st.session_state.selected_molecules.append(molecule['name'])
-        elif not selected and molecule['name'] in st.session_state.selected_molecules:
-            st.session_state.selected_molecules.remove(molecule['name'])
-
-    if st.button("Predict Properties", key='view_properties') and st.session_state.selected_molecules:
+    st.title("Molecule Selection")
+    
+    # Display large molecule
+    core_smiles = 'O=C1C([*:3])=C([*:2])C2=CC(N[*:1])=CC=C2N1[*:4]'
+    display_large_molecule(core_smiles)
+    
+    # Load and display DataFrame
+    df = load_molecule_dataframe()
+    
+    st.write("Select up to 4 molecules:")
+    selected_indices = st.multiselect(
+        "Choose molecules",
+        options=df.index.tolist(),
+        format_func=lambda x: df.loc[x, 'Name'],  # Assuming 'Name' is a column in your DataFrame
+        max_selections=4
+    )
+    
+    if st.button("Predict Properties", key='view_properties') and selected_indices:
+        st.session_state.selected_molecules = [df.loc[i, 'Name'] for i in selected_indices]
         st.session_state.page = 'property_view'
         st.rerun()
 
@@ -398,7 +385,10 @@ def get_traffic_light_color(property_name, value):
 def main():
     st.title("Molecular Property Predictor")
     local_css("style.css")  
-
+    
+    core_smiles = 'O=C1C([*:3])=C([*:2])C2=CC(N[*:1])=CC=C2N1[*:4]'
+    display_large_molecule(core_smiles)
+    
     # Use session state to store selected molecules
     if 'selected_molecules' not in st.session_state:
         st.session_state.selected_molecules = []
