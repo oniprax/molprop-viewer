@@ -1,3 +1,5 @@
+import base64
+import io
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,8 +8,6 @@ import plotly.express as px
 from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import rdDepictor
-import base64
-import io
 
 st.set_page_config(page_title="Molecular Property Predictor", layout="wide")
 
