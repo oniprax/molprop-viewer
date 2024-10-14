@@ -54,8 +54,8 @@ def display_molecule_table(df):
     df['Structure'] = df['Mol'].apply(mol_to_html)
 
     # Reorder columns
-    columns = ['Select', 'ID', 'Structure', 'R1', 'R2', 'R3', 'R4']
-    df = df[columns]
+    # columns = ['Select', 'ID', 'Structure', 'R1', 'R2', 'R3', 'R4']
+    # df = df[columns]
 
     # Display the dataframe
     edited_df = st.data_editor(
