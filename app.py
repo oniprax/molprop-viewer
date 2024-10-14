@@ -22,24 +22,36 @@ def display_large_molecule(smiles):
     
 @st.cache_data
 def load_molecule_dataframe():
-    return pd.read_pickle("./ccdd_moldf.pkl")
+    df = pd.read_pickle("./ccdd_moldf.pkl")
+    # Convert SMILES to RDKit molecule objects
+    df['Molecule'] = df['Mol'].apply(Chem.MolFromSmiles)
+    df['R1'] = df['R1'].apply(Chem.MolFromSmiles)
+    df['R2'] = df['R2'].apply(Chem.MolFromSmiles)
+    df['R3'] = df['R3'].apply(Chem.MolFromSmiles)
+    df['R4'] = df['R4'].apply(Chem.MolFromSmiles)
+    return df
+
 
 def mol_to_img(mol):
-    img = Draw.MolToImage(mol)
+    img = Draw.MolToImage(mol, size=(150, 150))
     buffered = io.BytesIO()
     img.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
-    
+
 def display_molecule_table(df):
+    # Initialize session state for selections if not exists
+    if 'selections' not in st.session_state:
+        st.session_state.selections = [False] * len(df)
+
     # Create a column for checkboxes
-    df['Select'] = False
+    df['Select'] = st.session_state.selections
 
     # Function to create HTML for molecule image
     def mol_to_html(mol):
-        return f'<img src="data:image/png;base64,{mol_to_img(mol)}" width="100">'
+        return f'<img src="data:image/png;base64,{mol_to_img(mol)}" width="150">'
 
     # Apply the function to create a new column with HTML
-    df['Structure'] = df['Mol'].apply(mol_to_html)
+    df['Structure'] = df['Molecule'].apply(mol_to_html)
 
     # Reorder columns
     columns = ['Select', 'ID', 'Structure', 'R1', 'R2', 'R3', 'R4']
@@ -52,16 +64,23 @@ def display_molecule_table(df):
         column_config={
             "Select": st.column_config.CheckboxColumn(required=True),
             "Structure": st.column_config.Column(width="medium"),
-            "Name": st.column_config.TextColumn(width="medium"),
+            "ID": st.column_config.TextColumn(width="small"),
+            "R1": st.column_config.TextColumn(width="medium"),
+            "R2": st.column_config.TextColumn(width="medium"),
+            "R3": st.column_config.TextColumn(width="medium"),
+            "R4": st.column_config.TextColumn(width="medium"),
         },
         disabled=df.columns.drop('Select'),
         key="molecule_table"
     )
 
+    # Update session state with new selections
+    st.session_state.selections = edited_df['Select'].tolist()
+
     # Get selected molecules
     selected_molecules = edited_df[edited_df['Select']]['ID'].tolist()
     
-    return selected_molecules    
+    return selected_molecules
     
 @st.cache_data
 def load_molecules():
@@ -422,12 +441,7 @@ def get_traffic_light_color(property_name, value):
         return "green"
 
 def main():
-    st.title("Molecular Property Predictor")
-    local_css("style.css")  
-    
-    # Use session state to store selected molecules
-    if 'selected_molecules' not in st.session_state:
-        st.session_state.selected_molecules = []
+    st.set_page_config(page_title="Molecular Property Predictor", layout="wide")
 
     if 'page' not in st.session_state:
         st.session_state.page = 'selection'
