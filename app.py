@@ -15,7 +15,7 @@ def local_css(file_name):
 
 def display_large_molecule(smiles):
     mol = Chem.MolFromSmiles(smiles)
-    img = Draw.MolToImage(mol, size=(800, 400))
+    img = Draw.MolToImage(mol, size=(400, 400))
     st.image(img, use_column_width=True)
     
 @st.cache_data
@@ -385,9 +385,6 @@ def get_traffic_light_color(property_name, value):
 def main():
     st.title("Molecular Property Predictor")
     local_css("style.css")  
-    
-    core_smiles = 'O=C1C([*:3])=C([*:2])C2=CC(N[*:1])=CC=C2N1[*:4]'
-    display_large_molecule(core_smiles)
     
     # Use session state to store selected molecules
     if 'selected_molecules' not in st.session_state:
