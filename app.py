@@ -17,7 +17,7 @@ def local_css(file_name):
 
 def display_large_molecule(smiles):
     mol = Chem.MolFromSmiles(smiles)
-    img = Draw.MolToImage(mol, size=(400, 400))
+    img = Draw.MolToImage(mol, size=(300, 300))
     st.image(img, use_column_width=True)
     
 @st.cache_data
@@ -34,22 +34,29 @@ def load_molecule_dataframe():
     return df
 
 def mol_to_img(mol):
-    img = Draw.MolToImage(mol, size=(150, 150))
+    try:
+        # Try to generate 2D coordinates for the molecule
+        AllChem.Compute2DCoords(mol)
+        img = Draw.MolToImage(mol, size=(150, 150))
+    except:
+        # If that fails, create a simple depiction
+        img = Draw.MolToImage(mol, size=(150, 150), kekulize=False)
+    
     buffered = io.BytesIO()
     img.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
 
 def display_molecule_table(df):
-    # Initialize session state for selections if not exists
     if 'selections' not in st.session_state:
         st.session_state.selections = [False] * len(df)
 
-    # Create a column for checkboxes
     df['Select'] = st.session_state.selections
 
-    # Function to create HTML for molecule image
     def mol_to_html(mol):
-        return f'<img src="data:image/png;base64,{mol_to_img(mol)}" width="150">'
+        try:
+            return f'<img src="data:image/png;base64,{mol_to_img(mol)}" width="150">'
+        except:
+            return "Unable to render molecule"
 
     # Apply the function to create a new column with HTML
     df['Structure'] = df['Mol'].apply(mol_to_html)
