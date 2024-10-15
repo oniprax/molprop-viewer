@@ -22,15 +22,15 @@ def display_large_molecule(smiles):
     
 @st.cache_data
 def load_molecule_dataframe():
-    df = pd.read_pickle("./ccdd_moldf.pkl")
+    df = pd.read_pickle("./ccdd_smidf.pkl")
     # # Convert SMILES to RDKit molecule objects
-    # for i,row in df.iterrows():
-    #     row['Mol'] = Chem.MolFromSmiles(row['Mol'])
-    #     row['R1'] = Chem.MolFromSmiles(row['R1'])
-    #     row['R2'] = Chem.MolFromSmiles(row['R2'])
-    #     row['R3'] = Chem.MolFromSmiles(row['R3'])
-    #     row['R4'] = Chem.MolFromSmiles(row['R4'])
-    # df.reset_index(inplace=True)
+    for i,row in df.iterrows():
+        row['Mol'] = Chem.MolFromSmiles(row['Mol'])
+        row['R1'] = Chem.MolFromSmiles(row['R1'])
+        row['R2'] = Chem.MolFromSmiles(row['R2'])
+        row['R3'] = Chem.MolFromSmiles(row['R3'])
+        row['R4'] = Chem.MolFromSmiles(row['R4'])
+    df.reset_index(inplace=True)
     return df
 
 def mol_to_img(mol):
