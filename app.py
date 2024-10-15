@@ -14,11 +14,6 @@ st.set_page_config(page_title="Molecular Property Predictor", layout="wide")
 def local_css(file_name):
     with open(file_name, 'r') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-# def display_large_molecule(smiles):
-#     mol = Chem.MolFromSmiles(smiles)
-#     img = Draw.MolToImage(mol, size=(500, 500))
-#     st.image(img, use_column_width=False)
     
 def landing_page():
     st.title("Molecular Property Predictor")
@@ -41,14 +36,6 @@ def landing_page():
 @st.cache_data
 def load_molecule_dataframe():
     df = pd.read_pickle("./ccdd_moldf.pkl")
-    # # Convert SMILES to RDKit molecule objects
-    # for i,row in df.iterrows():
-        # row['Mol'] = Chem.MolFromSmiles(row['Mol'])
-        # row['R1'] = Chem.MolFromSmiles(row['R1'])
-        # row['R2'] = Chem.MolFromSmiles(row['R2'])
-        # row['R3'] = Chem.MolFromSmiles(row['R3'])
-        # row['R4'] = Chem.MolFromSmiles(row['R4'])
-    # df.reset_index(inplace=True)
     return df
 
 def mol_to_img(mol,size=(150,150)):
@@ -85,25 +72,6 @@ def display_molecule_table(df):
     }
     </style>
     """, unsafe_allow_html=True)
-    
-    # st.markdown("""
-    # <style>
-    # .centered-content {
-    #     display: flex;
-    #     justify-content: center;
-    #     align-items: center;
-    #     height: 100%;
-    # }
-    # .centered-bold {
-    #     text-align: center;
-    #     font-weight: bold;
-    # }
-    # .centered-image {
-    #     display: flex;
-    #     justify-content: center;
-    # }
-    # </style>
-    # """, unsafe_allow_html=True)
 
     # Table header
     # header_col1, header_col2, header_col3, header_col4, header_col5, header_col6, header_col7 = st.columns([0.3, 0.5, 1, 0.75, 0.75, 0.75, 0.75])
@@ -190,13 +158,6 @@ def load_molecules():
                  'solubility': 52.0,
                  'permeability': 6.85,
                  'synthesisability': 0.71}},
- # {'name': 'ID',
- #  'smiles': 'CN1CCN(CC1)C1=CC(=O)Nc2ccc(cc21)Nc1ccnc(c1C#N)Cl',
- #  'properties': {'potency': 5.44,
- #                 'lipophilicity': 2.94,
- #                 'solubility': 40.0,
- #                 'permeability': 5.52,
- #                 'synthesisability': 0.73}},
  {'name': 'ID04',
   'smiles': 'Cn1cc(cn1)C1=CC(=O)N(CC2CCOCC2)c2ccc(cc21)Nc1ccnc(c1C#N)Cl',
   'properties': {'potency': 5.73,
@@ -225,13 +186,6 @@ def load_molecules():
                  'solubility': 64.0,
                  'permeability': 4.16,
                  'synthesisability': 0.67}},
- # {'name': 'ID',
- #  'smiles': 'CCNC1=CC(=O)N(C)c2ccc(cc21)Nc1cc(nc(c1C#N)Cl)C(=O)O',
- #  'properties': {'potency': 6.05,
- #                 'lipophilicity': 3.33,
- #                 'solubility': 237.0,
- #                 'permeability': 6.37,
- #                 'synthesisability': 0.72}},
  {'name': 'ID08',
   'smiles': 'C[C@@H](NC1=CC(=O)N(C)c2ccc(cc21)Nc1ccnc(c1C#N)Cl)C(=O)NC1CCCC1',
   'properties': {'potency': 6.59,
@@ -246,13 +200,6 @@ def load_molecules():
                  'solubility': 0.0,
                  'permeability': 5.96,
                  'synthesisability': 0.64}},
- # {'name': 'ID',
- #  'smiles': 'CN1C(=O)C=C(NC(C)(C)c2ncccn2)c2cc(ccc21)Nc1ccnc(c1C#N)Cl',
- #  'properties': {'potency': 6.33,
- #                 'lipophilicity': 4.34,
- #                 'solubility': 15.0,
- #                 'permeability': 13.51,
- #                 'synthesisability': 0.69}},
  {'name': 'ID10',
   'smiles': 'CN1C(=O)C2=C(N[C@@H](C3CC3)C(F)(F)CO2)c2cc(ccc21)Nc1nc(ncc1Cl)-n1nc(cc1C)C',
   'properties': {'potency': 7.95,
@@ -267,13 +214,6 @@ def load_molecules():
                  'solubility': 17.0,
                  'permeability': 12.6,
                  'synthesisability': 0.6}},
- # {'name': 'ID',
- #  'smiles': 'CN1C(=O)C2=C(N[C@@H](C3CC3)C(F)(F)CO2)c2cc(ccc21)Nc1nc(ncc1Cl)N1C2CCC1CN(C2)C(=O)C',
- #  'properties': {'potency': 9.04,
- #                 'lipophilicity': 4.14,
- #                 'solubility': 34.81,
- #                 'permeability': 11.96,
- #                 'synthesisability': 0.48}},
  {'name': 'ID12',
   'smiles': 'C[C@@H]1C[C@H](O)CN(C1)c1ncc(c(n1)Nc1ccc2c(c1)C1=C(OCC(F)(F)[C@@H](N1)C1CC1)C(=O)N2C)Cl',
   'properties': {'potency': 8.56,
@@ -488,18 +428,6 @@ def display_radar_plot(selected_data):
         width=800
     )
 
-    # Add property names as annotations
-    # for i, prop in enumerate(df.columns):
-    #     angle = i * 360 / len(df.columns)
-    #     fig.add_annotation(
-    #         # text=f"{prop}<br>Max: {max_values[prop]:.2f}",
-    #         text=f"{prop}",
-    #         x=1.2 * np.cos(np.radians(angle)),
-    #         y=1.2 * np.sin(np.radians(angle)),
-    #         showarrow=False,
-    #         font=dict(size=12)
-    #     )
-
     st.plotly_chart(fig, use_container_width=True)
 
 def display_property_descriptions():
@@ -511,23 +439,6 @@ def display_property_descriptions():
     property_descriptions = get_property_descriptions()  # Use the cached function
     for prop, desc in property_descriptions.items():
         st.markdown(f"- **{prop}**: {desc}")
-
-def get_traffic_light_color(property_name, value):
-    thresholds = {
-        "potency": {"low": 6, "high": 7},
-        "lipophilicity": {"low": 3, "high": 4},
-        "solubility": {"low": 30, "high": 60},
-        "permeability": {"low": 8, "high": 12},
-        "synthesisability": {"low": 0.65, "high": 0.7}
-    }
-    
-    low, high = thresholds[property_name]["low"], thresholds[property_name]["high"]
-    if value <= low:
-        return "red"
-    elif value <= high:
-        return "yellow"
-    else:
-        return "green"
 
 def main():
     local_css("style.css")  
