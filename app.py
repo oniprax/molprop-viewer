@@ -329,7 +329,7 @@ def property_view_page():
         with cols[i]:
             svg = mol_to_svg(mol['smiles'], size=200)  # Increased size
             if svg != "Invalid SMILES":
-                st.components.v1.html(svg, height=180, width=180)
+                st.components.v1.html(svg, height=200, width=200)
             else:
                 st.warning(f"Could not render molecule: {mol['name']}")
             st.markdown(f"<p style='text-align: center; font-weight: bold; font-size: 20px; margin: 0;'>{mol['name']}</p>", unsafe_allow_html=True)
