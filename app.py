@@ -77,6 +77,12 @@ def display_molecule_table(df):
     font-weight: bold;
     font-size: 20px; 
 }
+.centered-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
 </style>
 """, unsafe_allow_html=True)
     # st.markdown("""
