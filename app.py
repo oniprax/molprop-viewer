@@ -67,23 +67,36 @@ def display_molecule_table(df):
         st.session_state.selections = [False] * len(df)
  # CSS for centering and bolding
     st.markdown("""
-    <style>
-    .centered-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-    .centered-bold {
-        text-align: center;
-        font-weight: bold;
-    }
-    .centered-image {
-        display: flex;
-        justify-content: center;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+<style>
+.centered-bold {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;  /* Adjust this value to change the font size */
+}
+</style>
+""", unsafe_allow_html=True)
+    # st.markdown("""
+    # <style>
+    # .centered-content {
+    #     display: flex;
+    #     justify-content: center;
+    #     align-items: center;
+    #     height: 100%;
+    # }
+    # .centered-bold {
+    #     text-align: center;
+    #     font-weight: bold;
+    # }
+    # .centered-image {
+    #     display: flex;
+    #     justify-content: center;
+    # }
+    # </style>
+    # """, unsafe_allow_html=True)
 
     # Table header
     # header_col1, header_col2, header_col3, header_col4, header_col5, header_col6, header_col7 = st.columns([0.3, 0.5, 1, 0.75, 0.75, 0.75, 0.75])
@@ -104,7 +117,7 @@ def display_molecule_table(df):
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
-            st.markdown(f'<div class="centered-bold">{row["ID"]}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="centered-bold" style="height: 150px;">{row["ID"]}</div>', unsafe_allow_html=True)
         
         
         with col3:
