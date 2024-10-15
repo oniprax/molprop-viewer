@@ -15,11 +15,29 @@ def local_css(file_name):
     with open(file_name, 'r') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-def display_large_molecule(smiles):
-    mol = Chem.MolFromSmiles(smiles)
-    img = Draw.MolToImage(mol, size=(500, 500))
-    st.image(img, use_column_width=False)
+# def display_large_molecule(smiles):
+#     mol = Chem.MolFromSmiles(smiles)
+#     img = Draw.MolToImage(mol, size=(500, 500))
+#     st.image(img, use_column_width=False)
     
+def landing_page():
+    st.title("Molecular Property Predictor")
+    
+    # Display large molecule at the centre
+    core_smiles = 'O=C1C([*:3])=C([*:2])C2=CC(N[*:1])=CC=C2N1[*:4]'
+    mol = Chem.MolFromSmiles(large_molecule_smiles)
+    img = Draw.MolToImage(mol, size=(400, 400))
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.image(img, use_column_width=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)  # Add some space
+    
+    if st.button("Generate Molecules", key='generate_molecules'):
+        st.session_state.page = 'molecule_selection'
+        st.rerun()    
+        
 @st.cache_data
 def load_molecule_dataframe():
     df = pd.read_pickle("./ccdd_moldf.pkl")
@@ -261,10 +279,9 @@ def get_property_descriptions():
     }
     
 def molecule_selection_page():
-    
-    # Display large molecule
-    core_smiles = 'O=C1C([*:3])=C([*:2])C2=CC(N[*:1])=CC=C2N1[*:4]'
-    display_large_molecule(core_smiles)
+    if st.button("Back to Home", key='back_to_home'):
+        st.session_state.page = 'landing'
+        st.rerun()
 
     st.title("Molecule Selection")
     
@@ -283,8 +300,12 @@ def molecule_selection_page():
         st.rerun()
 
 def property_view_page():
-    if st.button("← Back to Selection"):
-        st.session_state.page = 'selection'
+    if st.button("← Back to Home", key='back_to_home'):
+        st.session_state.page = 'landing'
+        st.rerun()
+    
+    if st.button("← Back to Selection", key='back_to_selection'):
+        st.session_state.page = 'molecule_selection'
         st.rerun()
 
     molecules = load_molecules()
@@ -461,9 +482,11 @@ def main():
     local_css("style.css")  
 
     if 'page' not in st.session_state:
-        st.session_state.page = 'selection'
+        st.session_state.page = 'landing'
 
-    if st.session_state.page == 'selection':
+    if st.session_state.page == 'landing':
+        landing_page()
+    elif st.session_state.page == 'molecule_selection':
         molecule_selection_page()
     elif st.session_state.page == 'property_view':
         property_view_page()
