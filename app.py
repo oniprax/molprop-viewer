@@ -322,7 +322,7 @@ def get_traffic_light_color(property_name, value):
 @st.cache_data
 def get_property_descriptions():
     return {
-        "potency": "Amount of molecule required to produce a specific effect",
+        "potency": "Relative strength of the molecule's therapeutic effect",
         "lipophilicity": "Measure of a molecule's ability to dissolve in fats, oils, and non-polar solvents",
         "solubility": "Ability of a molecule to dissolve in water",
         "permeability": "Ease with which a molecule can pass through cell membranes",
