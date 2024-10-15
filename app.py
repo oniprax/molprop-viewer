@@ -65,30 +65,30 @@ def display_molecule_table(df):
                 st.write("Unable to render molecule")
         
         with col4:
-            img = mol_to_img(row['R1'],size=(150,150))
+            img = mol_to_img(row['R1'],size=(120,120))
             if img:
-                st.image(img, width=100)
+                st.image(img, width=150)
             else:
                 st.write("Unable to render molecule")
         
         with col5:
-            img = mol_to_img(row['R2'],size=(150,150))
+            img = mol_to_img(row['R2'],size=(120,120))
             if img:
-                st.image(img, width=100)
+                st.image(img, width=150)
             else:
                 st.write("Unable to render molecule")
         
         with col6:
-            img = mol_to_img(row['R3'],size=(150,150))
+            img = mol_to_img(row['R3'],size=(120,120))
             if img:
-                st.image(img, width=100)
+                st.image(img, width=150)
             else:
                 st.write("Unable to render molecule")
         
         with col7:
-            img = mol_to_img(row['R4'],size=(150,150))
+            img = mol_to_img(row['R4'],size=(120,120))
             if img:
-                st.image(img, width=100)
+                st.image(img, width=150)
             else:
                 st.write("Unable to render molecule")
         
