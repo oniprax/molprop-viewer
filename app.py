@@ -17,7 +17,7 @@ def local_css(file_name):
 
 def display_large_molecule(smiles):
     mol = Chem.MolFromSmiles(smiles)
-    img = Draw.MolToImage(mol, size=(300, 300))
+    img = Draw.MolToImage(mol, size=(500, 500))
     st.image(img, use_column_width=False)
     
 @st.cache_data
@@ -33,9 +33,9 @@ def load_molecule_dataframe():
     # df.reset_index(inplace=True)
     return df
 
-def mol_to_img(mol):
+def mol_to_img(mol,size=(150,150)):
     try:
-        img = Draw.MolToImage(mol, size=(150, 150))
+        img = Draw.MolToImage(mol, size=size)
         return img
     except:
         return None
@@ -49,7 +49,7 @@ def display_molecule_table(df):
         st.session_state.selections = [False] * len(df)
 
     for i, (_, row) in enumerate(df.iterrows()):
-        col1, col2, col3, col4, col5, col6, col7 = st.columns([0.5, 1, 2, 1, 1, 1, 1])
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([0.5, 0.5, 2, 1, 1, 1, 1])
         
         with col1:
             st.session_state.selections[i] = st.checkbox("", key=f"select_{i}", value=st.session_state.selections[i])
@@ -58,35 +58,35 @@ def display_molecule_table(df):
             st.write(row['ID'])
         
         with col3:
-            img = mol_to_img(row['Mol'])
+            img = mol_to_img(row['Mol'],size=(200,200))
             if img:
                 st.image(img, width=150)
             else:
                 st.write("Unable to render molecule")
         
         with col4:
-            img = mol_to_img(row['R1'])
+            img = mol_to_img(row['R1'],size=(150,150))
             if img:
                 st.image(img, width=150)
             else:
                 st.write("Unable to render molecule")
         
         with col5:
-            img = mol_to_img(row['R2'])
+            img = mol_to_img(row['R2'],size=(150,150))
             if img:
                 st.image(img, width=150)
             else:
                 st.write("Unable to render molecule")
         
         with col6:
-            img = mol_to_img(row['R3'])
+            img = mol_to_img(row['R3'],size=(150,150))
             if img:
                 st.image(img, width=150)
             else:
                 st.write("Unable to render molecule")
         
         with col7:
-            img = mol_to_img(row['R4'])
+            img = mol_to_img(row['R4'],size=(150,150))
             if img:
                 st.image(img, width=150)
             else:
