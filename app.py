@@ -32,7 +32,7 @@ def landing_page():
     with col2:
         st.image(img, use_column_width=True)
     
-    st.markdown("<br>", unsafe_allow_html=True)  # Add some space
+    # st.markdown("<br>", unsafe_allow_html=True)  # Add some space
     
     if st.button("Generate Molecules", key='generate_molecules'):
         st.session_state.page = 'molecule_selection'
