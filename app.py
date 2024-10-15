@@ -327,7 +327,7 @@ def property_view_page():
     cols = st.columns(4)
     for i, mol in enumerate(selected_data):
         with cols[i]:
-            svg = mol_to_svg(mol['smiles'], size=180)  # Increased size
+            svg = mol_to_svg(mol['smiles'], size=300)  # Increased size
             if svg != "Invalid SMILES":
                 st.components.v1.html(svg, height=180, width=180)
             else:
