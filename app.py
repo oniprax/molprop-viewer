@@ -277,7 +277,7 @@ def molecule_selection_page():
     if len(selected_molecules) > 4:
         st.warning("Please select no more than 4 molecules.")
     
-    if st.button("View Properties", key='view_properties') and 0 < len(selected_molecules) <= 4:
+    if st.button("Predict properties", key='view_properties') and 0 < len(selected_molecules) <= 4:
         st.session_state.selected_molecules = selected_molecules
         st.session_state.page = 'property_view'
         st.rerun()
