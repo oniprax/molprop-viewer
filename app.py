@@ -261,16 +261,17 @@ def get_property_descriptions():
     }
     
 def molecule_selection_page():
-    st.title("Molecule Selection")
     
     # Display large molecule
     core_smiles = 'O=C1C([*:3])=C([*:2])C2=CC(N[*:1])=CC=C2N1[*:4]'
     display_large_molecule(core_smiles)
+
+    st.title("Molecule Selection")
     
     # Load and display DataFrame
     df = load_molecule_dataframe()
     
-    st.write("Select up to 4 molecules:")
+    st.subheader("Select up to 4 molecules:")
     selected_molecules = display_molecule_table(df)
     
     if len(selected_molecules) > 4:
