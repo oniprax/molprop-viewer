@@ -65,15 +65,47 @@ def mol_to_img(mol,size=(150,150)):
 def display_molecule_table(df):
     if 'selections' not in st.session_state:
         st.session_state.selections = [False] * len(df)
+ # CSS for centering and bolding
+    st.markdown("""
+    <style>
+    .centered-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+    .centered-bold {
+        text-align: center;
+        font-weight: bold;
+    }
+    .centered-image {
+        display: flex;
+        justify-content: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
+    # Table header
+    # header_col1, header_col2, header_col3, header_col4, header_col5, header_col6, header_col7 = st.columns([0.3, 0.5, 1, 0.75, 0.75, 0.75, 0.75])
+    # header_col1.markdown('<div class="centered-bold">Select</div>', unsafe_allow_html=True)
+    # header_col2.markdown('<div class="centered-bold">ID</div>', unsafe_allow_html=True)
+    # header_col3.markdown('<div class="centered-bold">Structure</div>', unsafe_allow_html=True)
+    # header_col4.markdown('<div class="centered-bold">R1</div>', unsafe_allow_html=True)
+    # header_col5.markdown('<div class="centered-bold">R2</div>', unsafe_allow_html=True)
+    # header_col6.markdown('<div class="centered-bold">R3</div>', unsafe_allow_html=True)
+    # header_col7.markdown('<div class="centered-bold">R3</div>', unsafe_allow_html=True)
+    
     for i, (_, row) in enumerate(df.iterrows()):
         col1, col2, col3, col4, col5, col6, col7 = st.columns([0.3, 0.5, 1, 0.75, 0.75, 0.75, 0.75])
         
         with col1:
+            st.markdown('<div class="centered-content">', unsafe_allow_html=True)
             st.session_state.selections[i] = st.checkbox("", key=f"select_{i}", value=st.session_state.selections[i])
+            st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
-            st.write(row['ID'])
+            st.markdown(f'<div class="centered-bold">{row["ID"]}</div>', unsafe_allow_html=True)
+        
         
         with col3:
             img = mol_to_img(row['Mol'],size=(180,180))
