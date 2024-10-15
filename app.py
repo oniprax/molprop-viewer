@@ -25,7 +25,7 @@ def landing_page():
     
     # Display large molecule at the centre
     core_smiles = 'O=C1C([*:3])=C([*:2])C2=CC(N[*:1])=CC=C2N1[*:4]'
-    mol = Chem.MolFromSmiles(large_molecule_smiles)
+    mol = Chem.MolFromSmiles(core_smiles)
     img = Draw.MolToImage(mol, size=(400, 400))
     
     col1, col2, col3 = st.columns([1,2,1])
