@@ -31,7 +31,7 @@ def landing_page():
     
     st.subheader("Optimise properties:")
     
-    display_property_descriptions()
+    display_property_descriptions(title=False)
     
     if st.button("Generate Molecules", key='generate_molecules'):
         st.session_state.page = 'molecule_selection'
@@ -434,8 +434,9 @@ def display_radar_plot(selected_data):
 
     st.plotly_chart(fig, use_container_width=True)
 
-def display_property_descriptions():
-    st.subheader("Property Descriptions")
+def display_property_descriptions(title=True):
+    if title:
+        st.subheader("Property Descriptions")
     st.markdown(
         "<style>div[data-testid='stMarkdownContainer'] ul { font-size: 14px; }</style>",
         unsafe_allow_html=True
