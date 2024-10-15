@@ -289,6 +289,7 @@ def molecule_selection_page():
     df = load_molecule_dataframe()
     
     st.subheader("Select up to 4 molecules:")
+    st.markdown("<br>", unsafe_allow_html=True)  # Add some space
     selected_molecules = display_molecule_table(df)
     
     if len(selected_molecules) > 4:
