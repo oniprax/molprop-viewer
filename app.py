@@ -119,13 +119,12 @@ def display_molecule_table(df):
         col1, col2, col3, col4, col5, col6, col7 = st.columns([0.3, 0.5, 1, 0.75, 0.75, 0.75, 0.75])
         
         with col1:
-            st.markdown('<div class="centered-content" style="height: 200px;>', unsafe_allow_html=True)
+            st.markdown('<div class="centered-content" style="height: 100px;>', unsafe_allow_html=True)
             st.session_state.selections[i] = st.checkbox("", key=f"select_{i}", value=st.session_state.selections[i])
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown(f'<div class="centered-bold" style="height: 150px;">{row["ID"]}</div>', unsafe_allow_html=True)
-        
         
         with col3:
             img = mol_to_img(row['Mol'],size=(180,180))
