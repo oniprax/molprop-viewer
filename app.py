@@ -75,7 +75,7 @@ def display_molecule_table(df):
     height: 100%;
     text-align: center;
     font-weight: bold;
-    font-size: 18px;  /* Adjust this value to change the font size */
+    font-size: 20px; 
 }
 </style>
 """, unsafe_allow_html=True)
@@ -112,7 +112,7 @@ def display_molecule_table(df):
         col1, col2, col3, col4, col5, col6, col7 = st.columns([0.3, 0.5, 1, 0.75, 0.75, 0.75, 0.75])
         
         with col1:
-            st.markdown('<div class="centered-content">', unsafe_allow_html=True)
+            st.markdown('<div class="centered-content" style="height: 150px;>', unsafe_allow_html=True)
             st.session_state.selections[i] = st.checkbox("", key=f"select_{i}", value=st.session_state.selections[i])
             st.markdown('</div>', unsafe_allow_html=True)
         
