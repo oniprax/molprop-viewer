@@ -75,13 +75,13 @@ def display_molecule_table(df):
         height: 100%;
         text-align: center;
         font-weight: bold;
-        font-size: 20px; 
+        font-size: 22px; 
     }
     .centered-content {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 150%;
+        height: 200%;
     }
     </style>
     """, unsafe_allow_html=True)
