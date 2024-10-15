@@ -49,7 +49,7 @@ def display_molecule_table(df):
         st.session_state.selections = [False] * len(df)
 
     for i, (_, row) in enumerate(df.iterrows()):
-        col1, col2, col3, col4, col5, col6, col7 = st.columns([0.3, 0.5, 1.5, 1, 1, 1, 1])
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([0.3, 0.5, 1, 1, 1, 1, 1])
         
         with col1:
             st.session_state.selections[i] = st.checkbox("", key=f"select_{i}", value=st.session_state.selections[i])
