@@ -32,7 +32,7 @@ def landing_page():
     st.subheader("Optimise properties:")
     
     display_property_descriptions(title=False)
-    
+    st.markdown("<br>", unsafe_allow_html=True)
     if st.button("Generate Molecules", key='generate_molecules'):
         st.session_state.page = 'molecule_selection'
         st.rerun()    
