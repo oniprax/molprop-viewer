@@ -67,24 +67,25 @@ def display_molecule_table(df):
         st.session_state.selections = [False] * len(df)
  # CSS for centering and bolding
     st.markdown("""
-<style>
-.centered-bold {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    text-align: center;
-    font-weight: bold;
-    font-size: 20px; 
-}
-.centered-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-</style>
-""", unsafe_allow_html=True)
+    <style>
+    .centered-bold {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px; 
+    }
+    .centered-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # st.markdown("""
     # <style>
     # .centered-content {
