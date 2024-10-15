@@ -478,7 +478,6 @@ def get_traffic_light_color(property_name, value):
         return "green"
 
 def main():
-    st.title("Molecular Property Predictor")
     local_css("style.css")  
 
     if 'page' not in st.session_state:
